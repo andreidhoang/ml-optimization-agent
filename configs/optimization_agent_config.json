@@ -1,0 +1,15 @@
+{
+  "model_name": "anthropic/claude-sonnet-4-6",
+  "mcpServers": {},
+  "save_sessions": true,
+  "share_traces": true,
+  "yolo_mode": false,
+  "max_iterations": 300,
+  "reasoning_effort": "high",
+  "optimization_target": null,
+  "target_hardware": null,
+  "quality_budget": 0.98,
+  "optimization_loop_enabled": true,
+  "audit_log_path": "~/.cosmos_lab/audit.jsonl",
+  "trajectory_db_path": "~/.cosmos_lab/trajectories.duckdb"
+}
