@@ -1,6 +1,6 @@
 # cosmos-lab — Context Harness
 
-> **What this is**: zero-diff fork of `huggingface/ml-intern` that ships the **cosmos-lab** library — 6 production-grade ML lifecycle agents on a sentinel-gated, identity-scoped, self-improving runtime. Plugs into `nvidia-nat` (primary), `ml-intern` (compat), Claude SDK (v1.1).
+> **What this is**: zero-diff fork of `huggingface/ml-intern` that ships the **cosmos-lab** library — **one exceptional autonomous PrincipalAgent** doing long-horizon ML lifecycle work, with 6 demonstrated capability domains (data, eval, train, optimize, multimodal, code), built on ml-intern's `agent_loop.py` substrate. Governance (sentinels, MCP-OAuth identity, GEPA self-improvement) exists as **enabler of autonomy**, not constraint. Runs natively on `nvidia-nat`. See `docs/01_north_star.md` for vision; PLAN_V2.md §0.9 for the autonomous-agent thesis; PLAN_V2.md §3.2 for PrincipalAgent architecture.
 
 **Current phase** → `docs/02_current_phase.md` (LIVE — read this first when starting work)
 
