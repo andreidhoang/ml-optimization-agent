@@ -32,8 +32,20 @@
 | 9 invariants | `§0 Invariants` |
 | Reuse map (upstream + external) | `§1.5 Reuse map` |
 | Sentinel taxonomy | `§3.1 Sentinel taxonomy` |
+| PrincipalAgent architecture (long-horizon loop, memory tiers) | `§3.2 PrincipalAgent architecture` |
+| Agentic eval architecture (5-tier + 6 surfaces) | `§3.3 Agentic eval architecture` (pointer) → `AGENTIC_EVAL_SPEC.md` (full spec) |
 | Vendor independence | `§6.5 Vendor independence` |
 | Open questions | `§8 Open questions` |
+
+## Companion specification docs (load on-demand)
+
+| Need | Read |
+|---|---|
+| ML-output eval methodology (perplexity, KL, latency p99, GPU OOM) | `EVAL_SPEC.md` |
+| Agent-system eval methodology (trajectory, plan, replan, capability boundary, reward-hack, cross-agent comparison) | `AGENTIC_EVAL_SPEC.md` |
+| Original 16-week ML optimization plan (historical) | `PLAN.md` |
+| Architecture deep-dive (Vietnamese) | `SYSTEM.md` |
+| AHE research informing P8 GEPA decisions | `RESEARCH_AHE_ANALYSIS.md` |
 
 ## How to read PLAN_V2.md efficiently
 

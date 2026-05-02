@@ -79,7 +79,8 @@ git fetch upstream && git merge upstream/main              # daily upstream sync
 | Phase → PLAN_V2 anchor map | `docs/03_pointers.md` |
 | Full plan (24 sections, 837L) | `PLAN_V2.md` (read specific section, not whole file) |
 | Architecture deep WHY (Vietnamese, 1167L) | `SYSTEM.md` (rare — only for upstream debugging) |
-| Eval spec | `EVAL_SPEC.md` |
+| Eval spec — ML output (perplexity, KL, latency p99) | `EVAL_SPEC.md` |
+| Eval spec — agent system (trajectory, plan, replan, capability boundary, reward-hack, cross-agent) | `AGENTIC_EVAL_SPEC.md` |
 | Self-improvement research | `RESEARCH_AHE_ANALYSIS.md` |
 | Dev server / deploy notes | `AGENTS.md` |
 | NVIDIA Cosmos JD | `docs/04_jd.md` |

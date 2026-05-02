@@ -84,6 +84,7 @@ DIFF=$(git diff upstream/main --name-only 2>/dev/null \
     | grep -v "^EVAL_SPEC.md$" \
     | grep -v "^WORKFLOW.md$" \
     | grep -v "^RESEARCH_AHE_ANALYSIS.md$" \
+    | grep -v "^AGENTIC_EVAL_SPEC.md$" \
     | grep -v "^agentic_build_workflow" || true)
 if [[ -z "$DIFF" ]]; then
     echo "  ✅ git diff upstream/main --name-only shows owned paths only"

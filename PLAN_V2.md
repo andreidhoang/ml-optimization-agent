@@ -306,6 +306,25 @@ Without numbers, this is a roadmap, not a product plan. The following targets ar
 | **P10** | Production deployment | **deployed agent serves ≥ 100 real user sessions** over 1-week window (HF Spaces or Modal endpoint) | OTel traces + cost report committed |
 | **P10** | OSS upstream PR | **≥ 1 PR opened to nvidia-nat or Inspect AI** with sentinel pattern; review-ready, not draft | PR URL in P10 release notes |
 
+### v5 eval-system additions (per AGENTIC_EVAL_SPEC §9)
+
+These extend numerical targets with eval-system-specific commitments. Without these, the entire numerical-targets table above is unverifiable (per axiom A10: eval-of-eval).
+
+| # | Eval target | Commitment | How measured | Phase |
+|---|---|---|---|---|
+| **E1** | Sentinel suite false-positive rate | **≤ 5%** on null fixtures (identical agent A/B should never gate-fail) | M2 null fixture suite, weekly | P1 |
+| **E2** | Sentinel suite false-negative rate | **≤ 1%** on planted regressions (known-broken agent must always gate-fail) | M2 planted regression suite, weekly | P1 |
+| **E3** | T1 calibrated suite test-retest reliability | **r ≥ 0.95** on aggregate metrics across 2 runs | M2, monthly | P1 |
+| **E4** | Plan-quality LLM-judge ↔ human agreement | **≥ 80%** on 50-plan calibration sample | S2 calibration, quarterly | P4a |
+| **E5** | Replan success rate | **≥ 70%** (replans → next milestone sentinel-clean) | S3, continuous | P4a |
+| **E6** | Capability boundary probe pass rate | **100%** (0 unauthorized tool calls across 100 child-agent runs) | S4, nightly | P4b |
+| **E7** | Reward-hack discovery rate | **Trending downward over 6 months** (sentinel suite maturing) | S5, monthly | P4a |
+| **E8** | Cross-agent Pareto position | **PrincipalAgent on Pareto frontier** of cost × quality vs comparison agents | S6, quarterly | P10 |
+| **E9** | Eval cost as % of total project spend | **≤ 15%** of total GPU + compute budget | M3 cost telemetry, weekly | P1 |
+| **E10** | Reproducibility envelope coverage | **100%** of agent runs tagged with envelope (seeds + hashes + versions + OTel trace ID) | M1, every run | P1 |
+
+**Total numerical commitments**: 24 (original §0.7) + 10 (E1-E10) = **34 phase-exit conditions, all measurable, all gating decisions.**
+
 ---
 
 ## 0.8 Production-grade commitments — what makes v4 not a research roadmap
@@ -483,6 +502,18 @@ A senior-eng audit of both the upstream `ml-intern` codebase and external 2026 S
 | **Anthropic memory tool API** (`memory_*`) + **Letta** | File-based memory storage; agent loop with subagents | P7 — storage layer for memory; do not rebuild MemGPT-style paging |
 
 **v3 net effect**: roughly half of "platform code" becomes integration glue against well-known boundaries. Cosmos team reading the plan recognizes every interface — credibility through *fluency in their stack*, not novel reinvention.
+
+### Companion specification documents (v5)
+
+These live at repo root as deep references; agents load on-demand:
+
+| Document | Scope | When to read |
+|---|---|---|
+| `EVAL_SPEC.md` | ML-output evaluation (perplexity, KL divergence, latency p99, GPU OOM) — model under test | Working on P5/P6 (training/optimization), or any task with model output as deliverable |
+| `AGENTIC_EVAL_SPEC.md` | Agent-system evaluation (trajectory quality, plan quality, replan quality, capability boundary, reward-hacking, cross-agent comparison) — agent itself as artifact-under-eval per axiom A8 | Working on any P1+ phase that builds or evaluates the PrincipalAgent itself |
+| `PLAN.md` | Original 16-week ML optimization plan (superseded by PLAN_V2 v5) | Historical reference for optimization-vertical depth |
+| `SYSTEM.md` | Full architecture deep-dive (Vietnamese, 1167L) | Rare — only for upstream debugging |
+| `RESEARCH_AHE_ANALYSIS.md` | AHE (Agentic Harness Engineering) research informing P8 GEPA decisions | Working on P8 self-improvement loop |
 
 ---
 
@@ -782,6 +813,73 @@ cosmos_lab/principal/
 ```
 
 P3-P9 phases each ADD a capability domain to PrincipalAgent (data/eval/train/optimize/multimodal/code) — they're not separate agents, they're skill modules the same agent uses.
+
+---
+
+## 3.3 Agentic eval architecture (v5 — pointer to AGENTIC_EVAL_SPEC.md)
+
+The sentinel taxonomy (§3.1) is one piece of agentic eval. The full architecture lives in **`AGENTIC_EVAL_SPEC.md`** — companion to `EVAL_SPEC.md` (which covers ML-output eval; this companion covers agent-system eval per axiom A8 *"the agent is itself an artifact-under-eval"*).
+
+### Why a separate spec doc
+
+EVAL_SPEC.md evaluates models. AGENTIC_EVAL_SPEC.md evaluates agents. Three distinctions (per AGENTIC_EVAL_SPEC §1):
+1. **Trajectory is the deliverable, not just output** — two agents producing identical correct outputs can have radically different trajectory quality (one took 47 tool calls + 12 replans, the other took 3 calls correct first time)
+2. **Agent is itself artifact-under-eval (A8)** — strong MMLU + strong HumanEval ≠ strong agentic tool-use; need separate eval surface for agent decisions
+3. **Long-horizon eval is non-fungible with short-horizon eval (NEW axiom A13)** — a 5-day task is not 120 1-hour tasks; cross-session memory, plan staleness, capability expansion mid-task are new failure modes
+
+### What agentic eval architecture adds (over §3.1 sentinels alone)
+
+**5-tier ladder** (transfers from EVAL_SPEC, specialized for agentic):
+- T0 smoke / T1 calibrated quality / T2 long-horizon / T3 shadow / T4 canary
+
+**6 agentic-specific surfaces** (NEW — don't exist in EVAL_SPEC):
+- **S1 Trajectory eval** — tool-call efficiency, replan ratio, wasted-work, doom-loop frequency
+- **S2 Plan-quality eval** — LLM-judge on PLAN-phase decomposition (gates EXECUTE per §3.2)
+- **S3 Replan-quality eval** — sentinel trips → response quality (success rate, diversity, time-to-recovery)
+- **S4 Capability boundary eval** — 50-task denied-tool probe suite (security-critical for capability expansion per AGENTIC_EVAL_SPEC axiom A12)
+- **S5 Reward-hacking adversarial eval** — monthly red-team sprint (covers what UC Berkeley's 8/8-hackable-benchmarks crisis demands)
+- **S6 Cross-agent comparison eval** — PrincipalAgent vs Devin vs Claude Code vs human, quarterly Pareto chart (the differentiator pitch)
+
+**3 cross-cutting meta layers** (transfer from EVAL_SPEC):
+- M1 Reproducibility envelope, M2 Eval-of-eval, M3 Cost telemetry
+
+**3 input types** (per JD bullet 5):
+- I1 Automated metrics, I2 Human feedback (5% sampling + weekly review), I3 Agent-driven analysis
+
+### Operational cadence summary
+
+| Cadence | What runs | Cost budget |
+|---|---|---|
+| Every commit | T0 + S1 sanity | <$0.10 |
+| Every PR to main | T1 + S1 + S2 + S3 | $10-$50 |
+| Nightly | T1 + T2 + S4 | $50-$200 |
+| Weekly | T3 + S6 sample + I2 5% human review | $300-$700 |
+| Monthly | S5 red-team sprint + M2 eval-of-eval | $500-$1000 |
+| Per release | T4 canary + production monitoring | $300-$1000 + risk |
+| Quarterly | S6 cross-agent full Pareto comparison | $500-$2000 |
+
+### Integration with v5 phases
+
+Per AGENTIC_EVAL_SPEC §10, this architecture integrates into v5 phases without adding a new phase:
+- **P1** establishes T0/T1 + S1 + M1 + sentinel taxonomy
+- **P4a** EvalAgent capability builds S2 + S3 + I2 + S5 monthly red-team kickoff
+- **P4b** ships S4 capability boundary probe suite (security-critical, blocks identity v2 ship)
+- **P5/P6** runs T2 long-horizon eval on real GPU sweeps (per Invariant 9)
+- **P9b** ships first S6 cross-agent comparison (PrincipalAgent vs Claude Code on bug fixture)
+- **P10** runs T4 canary + first quarterly S6 full comparison
+
+**Net cost**: ~3-4 days additional spec/test work spread across phases.
+
+### 10 numerical eval-system targets
+
+Extends §0.7 (see "v5 eval-system additions" subtable). Examples:
+- E1: sentinel suite FPR ≤ 5% on null fixtures
+- E2: sentinel suite FNR ≤ 1% on planted regressions
+- E5: replan success rate ≥ 70%
+- E6: capability boundary 100% (0 unauthorized calls in 100 child runs)
+- E8: PrincipalAgent on Pareto frontier of cost × quality vs comparison agents
+
+Full target list in AGENTIC_EVAL_SPEC §9.
 
 ---
 
