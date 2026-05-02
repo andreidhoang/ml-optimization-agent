@@ -50,7 +50,7 @@ check "pyproject.toml has [project.optional-dependencies]" \
 
 echo "--- Tests ---"
 echo "  Running cosmos-lab tests..."
-if uv run pytest tests/optimization/ -q 2>&1 | tail -5; then
+if uv run python -m pytest tests/optimization/ -q 2>&1 | tail -5; then
     echo "  ✅ tests/optimization/ exits 0"
     PASS=$((PASS+1))
 else
