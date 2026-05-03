@@ -46,9 +46,18 @@ dev = [
     "pytest-asyncio>=1.2.0",
 ]
 
-# All dependencies (eval + dev)
+# cosmos-lab harness adapter extras (P0.5+)
+# These are placeholders; actual deps land as adapters are written:
+#   D2: ml_intern adapter (no new deps — uses upstream agent.core.session)
+#   D3: nat adapter (will pin nvidia-nat>=1.6.0)
+#   v1.1: claude_sdk adapter (will pin claude-agent-sdk)
+nat = []          # nvidia-nat>=1.6.0 added in P0.5 D3
+ml_intern = []    # no extra deps — uses upstream agent.core.* directly
+claude_sdk = []   # claude-agent-sdk added in v1.1
+
+# All dependencies (eval + dev + adapters)
 all = [
-    "ml-intern[eval,dev]",
+    "ml-intern[eval,dev,nat,ml_intern,claude_sdk]",
 ]
 
 [project.scripts]
@@ -63,7 +72,10 @@ build-backend = "setuptools.build_meta"
 # runtime (resolves to <site-packages>/configs/cli_agent_config.json).
 # Without it, `uv tool install` / `pip install` produce a broken install
 # that imports fine but crashes at startup with FileNotFoundError.
-include = ["agent*", "configs"]
+#
+# `cosmos_lab` is the v1 importable surface for the cosmos-lab library
+# (re-exports from agent.optimization.*). See PLAN_V2.md §0.4.
+include = ["agent*", "configs", "cosmos_lab*"]
 
 [tool.setuptools.package-data]
 configs = ["*.json"]
