@@ -211,6 +211,92 @@ workflow:
 
 ---
 
+## 0.4.5 Two-layer architecture (v5.1 — final decision after agent_loop audit)
+
+> **Audit finding (2026-05-03)**: a senior-engineering audit of `agent/core/agent_loop.py:1771` revealed that ml-intern's `submission_loop` is queue-based (`asyncio.Queue` for submissions in + events out), not function-based. Embedding it as a *runtime* substrate inside another orchestrator requires a 1-2 week async-bridge engineering effort that was not in the v5 budget. v5 implicitly assumed a 3-layer runtime (nat → cosmos-lab → ml-intern); the audit shows that's harder than the architecture diagrams suggested. v5.1 commits to the simpler answer.
+
+### The 2-layer decision
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  cosmos-lab CLI (PRIMARY entry point)                      │
+│  > cosmos-lab principal --task <spec>                      │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ cosmos_lab.principal.PrincipalAgent (orchestrator)   │  │
+│  │ - PLAN/EXECUTE/VERIFY/REPLAN long-horizon loop       │  │
+│  │ - 3-tier memory (working/episodic/semantic)           │  │
+│  │ - capability expansion (RFC 8693)                    │  │
+│  │ - sub-agent spawning (§3.2.8)                        │  │
+│  └──────────────────────────────────────────────────────┘  │
+│                          │                                   │
+│                          │ for each milestone, constructs     │
+│                          │ a fresh ml-intern Session,        │
+│                          │ installs governance, executes.    │
+│                          ▼                                   │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │ ml-intern Session (execution SUBSTRATE)              │  │
+│  │ - agent.core.agent_loop.submission_loop              │  │
+│  │ - 16 built-in tools + MCP                            │  │
+│  │ - sandbox, doom-loop detection, cost estimation      │  │
+│  │                                                       │  │
+│  │ Wrapped by cosmos_lab.harness.ml_intern adapter      │  │
+│  │ (D2 — installs CapabilityScopedRouter)               │  │
+│  └──────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────┘
+
+[Deployment wrappers — thin, P10 deliverable]:
+  • nat workflow YAML (Cosmos pitch)
+       └─► invokes `cosmos-lab principal --task` as a nat tool
+  • Modal / HF Spaces endpoint (production deploy)
+       └─► wraps `cosmos-lab principal` as HTTP service
+  • `pip install cosmos-lab` (standalone library)
+```
+
+### Separation of concerns (the load-bearing rationale)
+
+| Layer | Responsibility | Why this layer owns it |
+|---|---|---|
+| **cosmos-lab CLI + PrincipalAgent** | Long-horizon planning across multiple tasks; sentinel-gated replanning; capability expansion; sub-agent spawning; memory across sessions | Long-horizon = above any single ml-intern Session; orchestration is cosmos-lab's IP |
+| **ml-intern Session** | One task per session — read goal, ReAct loop, return result | ml-intern is debugged single-task ReAct (1626L); reuse, don't reimplement |
+| **nat (P10 deployment wrapper)** | Cosmos team can `nat run cosmos-lab.yaml` to invoke the CLI from their stack | Deployment surface only — no runtime hot path |
+
+### Why we explicitly REJECTED 3-layer runtime
+
+Three concrete reasons:
+
+1. **`submission_loop` is queue-based (agent_loop.py:1771)**: takes `asyncio.Queue` for submissions in + events out. To embed as substrate, PrincipalAgent must act as both "user" (push submissions) AND "UI" (drain events + translate event types into PLAN/EXECUTE/VERIFY signals). That's a real bridge layer — 1-2 weeks of async-coordination engineering, with known subtle-bug risk.
+
+2. **nat-at-runtime solves the wrong problem**: Cosmos pitch credibility only requires (a) we CAN run in their stack and (b) our code uses their patterns (OTel-GenAI, MCP-OAuth, NeMo-RL wrapping). Both are achievable with nat as deployment wrapper at P10. We don't need PrincipalAgent INSIDE a nat workflow at runtime.
+
+3. **Complexity budget**: 1-2 weeks of bridge work would come from sentinel taxonomy / 3-tier memory / capability expansion / 6 capability domains / AGENTIC_EVAL_SPEC surfaces / real GPU runs. Those are all higher value for the Cosmos pitch than nat-at-runtime. Honest tradeoff: ship deeper capability with simpler architecture.
+
+### What this preserves (everything important)
+
+- ✅ ml-intern leverage — Session is the execution substrate; D2 adapter (already shipped) installs governance
+- ✅ PrincipalAgent autonomy — long-horizon loop runs in cosmos-lab CLI, not constrained by single Session lifetime
+- ✅ Sub-agent spawning (§3.2.8) — PrincipalAgent spawns sub-agents that each construct their own ml-intern Session with scoped router
+- ✅ Cosmos pitch — nat wrapper at P10; runs in their stack
+- ✅ All 9 invariants, 34 numerical targets, 6 capability domains, 22.5-week schedule
+- ✅ All commits already shipped (P0, P0.5 D1, P0.5 D2, AGENTIC_EVAL_SPEC, v5 thesis)
+
+### What this changes for upcoming work
+
+- **P0.5 D3 reframed**: nat adapter scope reduced from "primary harness wrapping cosmos-lab governance into nat builder" → "lightweight `register_as_nat_tool()` shim so nat workflow can invoke `cosmos-lab principal --task` as a tool." ~50 LOC instead of ~200 LOC. ~1 hour instead of ~3 hours.
+- **P0.5 D4 reframed**: dual-adapter test matrix tests Session-based execution (D2 adapter) + CLI wrapper invocation (D3). Same shape as before, simpler implementation.
+- **§3.2 PrincipalAgent architecture**: clarify that PrincipalAgent constructs/uses ml-intern Sessions PER MILESTONE; PrincipalAgent's PLAN/EXECUTE/VERIFY/REPLAN happens at the level of "what task to give the next Session," not inside a Session's ReAct loop.
+
+### Net effect
+
+- **Plan complexity**: lower
+- **Cosmos pitch**: same (nat wrapper at P10 = "we run in your stack")
+- **ml-intern leverage**: same (D2 adapter installs governance into Sessions)
+- **PrincipalAgent capability**: same (long-horizon orchestration above the Session level — actually CLEANER conceptually)
+- **Schedule**: ~1.5-2 weeks of bridge work avoided; banked as risk buffer
+- **Anti-pattern avoided**: building 3 layers when 2 do the job (workflow anti-pattern #4 generalized)
+
+---
+
 ## 0.5 v3 deltas — what 2026 evidence forced us to change
 
 A 2026 SOTA verification pass produced eight load-bearing changes (rows 1-8 below) plus one architectural pivot in v3.2 (row 9). Each is grounded in a public artifact (paper / repo / blog / spec) with the date.

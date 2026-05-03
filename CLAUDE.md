@@ -59,13 +59,16 @@
 ## Dev commands
 
 ```bash
-uv sync                                                    # install
-uv run pytest tests/unit/ -q                               # upstream baseline (must match)
-uv run pytest tests/optimization/ -q                       # cosmos-lab tests (must pass)
+uv sync --extra dev                                        # install (--extra dev for pytest)
+uv run python -m pytest tests/unit/ -q                     # upstream baseline (must match)
+uv run python -m pytest tests/optimization/ -q             # cosmos-lab tests (must pass)
 PYTHONPATH=. ruff check agent/ --ignore E501,F401,E402     # lint
-./bin/verify.sh <phase>                                    # phase verifier (e.g. p0_5)
+./bin/verify.sh <phase>                                    # phase verifier (e.g. p0_5_d3)
 git fetch upstream && git merge upstream/main              # daily upstream sync
 ```
+
+Note: use `uv run python -m pytest` (NOT `uv run pytest`) — bare `uv run pytest`
+can resolve to a system pytest with stale package metadata. Captured in P0.5 D2 LEARN.
 
 ---
 

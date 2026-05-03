@@ -17,5 +17,6 @@ docs/02_current_phase.md for the current adapter being built.
 """
 
 from cosmos_lab.harness.ml_intern import install_into_session
+from cosmos_lab.harness.nat import register_as_nat_tool
 
-__all__ = ["install_into_session"]
+__all__ = ["install_into_session", "register_as_nat_tool"]

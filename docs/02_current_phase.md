@@ -1,74 +1,87 @@
-# Current Phase — P0.5 D3: nat adapter
+# Current Phase — P0.5 D4: dual-adapter test matrix + CONTRACT.md
 
 > ⚡ **LIVE FILE** — updated as we move through phases. If this is stale, fix it before doing more work.
 
-**Today's date**: 2026-05-03 (D1 + D2 shipped same-day)
+**Today's date**: 2026-05-03 (D1 + D2 + D3 + v5.1 architecture decision shipped same-day)
 **Active phase**: P0.5 (Library restructure + harness adapters, 4 days)
-**Active day**: **D3 of 4** — write `cosmos_lab/harness/nat.py` adapter (primary harness for Cosmos pitch)
+**Active day**: **D4 of 4 — final** — dual-adapter test matrix + CONTRACT.md
 
 ---
 
-## D1 + D2 — DONE (recap)
+## D1 + D2 + D3 — DONE (recap)
 
 ### D1 (cosmos_lab restructure) ✅
 - `cosmos_lab/__init__.py` + `cosmos_lab/identity/__init__.py` re-export shims
 - `pyproject.toml` updated: `cosmos_lab*` in packages.find + `[nat]`/`[ml_intern]`/`[claude_sdk]` extras
-- Verifier `./bin/verify.sh p0_5_d1` → 14/14 pass
+- Verifier: 14/14 pass
 
-### D2 (ml_intern adapter) ✅
-- `cosmos_lab/harness/__init__.py` + `cosmos_lab/harness/ml_intern.py` (84 LOC adapter)
-- `tests/optimization/harness/test_ml_intern_adapter.py` — 6 smoke tests (3 contract + 3 e2e behavior)
-- Public API: `from cosmos_lab.harness import install_into_session`
-- Verifier `./bin/verify.sh p0_5_d2` → 11/11 pass
+### D2 (ml_intern adapter — execution substrate) ✅
+- `cosmos_lab/harness/ml_intern.py` — `install_into_session()` wraps Session.tool_router
+- 6 smoke tests (3 contract + 3 e2e behavior)
+- Per v5.1: this is the **execution substrate adapter** (PrincipalAgent constructs Sessions, installs governance, runs tasks)
+- Verifier: 11/11 pass
 
-**LEARN from D2** — three surprises captured:
+### D3 (nat wrapper — deployment surface) ✅
+- `cosmos_lab/harness/nat.py` (132 LOC, ~78 non-comment) — `register_as_nat_tool()` registers `cosmos_lab_principal` as nat tool
+- 11 smoke tests covering registration mechanics + tool callable contract
+- Per v5.1: nat is **deployment wrapper, not runtime substrate** — invokes cosmos-lab CLI from a nat workflow
+- Tool body is v0 stub; real CLI invocation lands in P3 (PrincipalAgent v0)
+- Verifier: 10/10 pass
 
-1. **Editable install staleness**: adding `cosmos_lab/harness/` after the previous `uv sync` left the editable install metadata stale; new submodule was undiscoverable until re-sync. Pattern: any new package directory needs `uv sync` (and `uv sync --extra dev` for test deps) before tests pass.
+### v5.1 architectural decision (PLAN_V2 §0.4.5) ✅
+After auditing `agent_loop.py:1771` (queue-based `submission_loop`), committed to **2-layer architecture**:
+- **Layer 1**: cosmos-lab CLI (primary entry point) — PrincipalAgent + governance + sentinels + memory + sub-agent spawning
+- **Layer 2**: ml-intern Session as execution substrate (per task) — debugged ReAct, 16 tools, MCP, sandbox
+- **Deployment wrappers** (P10): nat workflow YAML, Modal/HF Spaces endpoint
+- Avoided: 1-2 weeks of async-bridge engineering for 3-layer runtime
+- Banked: schedule + complexity budget for sentinels/memory/capability domains
 
-2. **`uv run pytest` is ambiguous**: PATH leak — `uv run pytest` resolved to `/opt/miniconda3/bin/pytest` (system Python with stale editable install) instead of venv. Symptom: `python -c "import cosmos_lab.harness"` succeeded everywhere but pytest collection failed with `ModuleNotFoundError: No module named 'cosmos_lab'`. **Fix**: always use `uv run python -m pytest` for deterministic venv resolution. All verifier scripts updated.
-
-3. **Smoke test design**: writing a test that constructs a real `agent.core.session.Session` would require Config + ContextManager + event_queue + sandbox + more — fighting against composition philosophy. Used a duck-typed `MockSession` (just `.tool_router`) since adapter only touches that one attribute. **Pattern**: smoke test verifies the adapter contract, not the host's internals.
+**LEARN from D3 + v5.1 decision**:
+1. **Always read substrate code before architecting on it** — the queue-based submission_loop made 3-layer runtime non-trivial; should have read agent_loop.py earlier
+2. **`uv sync` without `--extra dev` removes pytest** — must use `uv sync --extra dev` to keep test deps. CLAUDE.md updated.
+3. **Two layers > three when one is sufficient** — workflow anti-pattern #4 generalized: don't add a layer that doesn't earn its complexity
 
 ---
 
-## D3 spec — Phase 1 of workflow (DEFINE)
+## D4 spec — Phase 1 of workflow (DEFINE)
 
 ### Goal (one sentence)
-Ship `cosmos_lab/harness/nat.py` (≤200 LOC) — an adapter that registers cosmos-lab governance (CapabilityScopedRouter wrapping nat's tool registry) inside a `nvidia-nat` Builder, with a smoke test proving capability denial works inside a `nat run` of a trivial workflow YAML.
+Ship `cosmos_lab/harness/CONTRACT.md` documenting the adapter contract that ALL harness adapters (current: ml_intern + nat; future: claude_sdk) must satisfy, plus a parametrized test matrix that runs the same contract tests against both shipped adapters.
 
 ### Spec — what it does
-- New module `cosmos_lab/harness/nat.py`
-- One public function: `install_into_nat(builder, identity, audit) -> None` that wraps the nat builder's tool router
-- Optional: register `OTelGenAIEmitter` placeholder (real emitter lands in P1)
-- Smoke test in `tests/optimization/harness/test_nat_adapter.py` verifying contract:
-  - `install_into_nat()` registers wrapped router as nat plugin
-  - Tool denial path works when called via nat workflow
-  - Tool authorized path passes through
+- New file `cosmos_lab/harness/CONTRACT.md` documenting:
+  - The 3-method adapter contract (registration, execution interface, lifecycle)
+  - What each adapter is responsible for vs what cosmos-lab core handles
+  - Per-adapter exceptions (e.g., ml_intern needs Session, nat needs Builder)
+- New test file `tests/optimization/harness/test_adapter_contract.py` parametrizing:
+  - `@pytest.mark.parametrize("adapter", ["ml_intern", "nat"])`
+  - Each contract assertion runs against both adapters
+  - Both must pass identically for any contract assertion that's adapter-shape-agnostic
 
 ### Spec — what it does NOT do (today)
-- Does NOT modify `nvidia-nat` package (Invariant 1 — composition)
-- Does NOT parametrize Phase 0 tests across both adapters yet (D4)
-- Does NOT add full OTel emitter (P1)
-- Does NOT validate against real `nat run` (mock the Builder protocol — pattern from D2 with MockSession)
+- Does NOT add a third adapter (claude_sdk is v1.1)
+- Does NOT change ml_intern or nat adapter implementations
+- Does NOT enforce contract at runtime via abstract base class — uses test-suite enforcement (more flexible for ducked Protocol patterns)
 
 ### Verifier
-`./bin/verify.sh p0_5_d3` — checks: module exists, ≤200 LOC, smoke test passes, dual-adapter (`ml_intern` + `nat`) parity check.
+`./bin/verify.sh p0_5_d4` — checks: CONTRACT.md exists, test_adapter_contract.py exists, parametrized matrix passes for both adapters, P0.5 closes (D1+D2+D3+D4 all green).
 
-### Open question for D3 D-day
-**`nvidia-nat` API surface** — we haven't pinned the exact Builder API yet. If `pip install nvidia-nat` fails on local Python 3.12, fall back to a Protocol-typed `BuilderLike` and treat the smoke test as contract-only (real nat integration deferred to D-day with hands-on verification). This is honest scoping, not retreat.
+### After D4 → P0.5 COMPLETE
+P0.5 ships in 4 days as planned. P1 starts: TrajectorySink + OTel-GenAI + Inspect AI + Sentinel taxonomy. PrincipalAgent v0 lands in P3.
 
 ---
 
-## D2 spec (archived, for reference)
+## D3 spec (archived, for reference)
 
 ### Goal (one sentence)
-Ship `cosmos_lab/harness/ml_intern.py` (≤200 LOC) — an adapter that installs cosmos-lab governance (identity + audit + capability-scoped router) into an existing `agent.core.session.Session` instance, with a smoke test proving capability denial + audit emission works inside a real ml-intern session.
+Ship `cosmos_lab/harness/nat.py` (~50 LOC) — a lightweight nat-tool registration shim that lets a nat workflow invoke `cosmos-lab principal --task <spec>` as a callable tool, with smoke test verifying registration contract works against mocked nat Builder API.
 
-(See git log for D1 spec.)
+(See git log for D1, D2 specs.)
 
 ---
 
-## After D3, next:
-- **D4**: dual-adapter test matrix — every Phase 0 test parameterized via `@pytest.mark.parametrize("harness", ["nat", "ml_intern"])`; both must pass identically. Document contract in `cosmos_lab/harness/CONTRACT.md`.
+## Branch state
 
-Full P0.5 spec → `PLAN_V2.md` §2.5 (read only when needed).
+`p0_5_library_restructure` — 9 commits planned (currently 8, D3 + v5.1 ready to commit as #9).
+
+After D4 → 10 commits, P0.5 complete, ready for PR.
