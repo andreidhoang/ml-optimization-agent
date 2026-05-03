@@ -40,7 +40,7 @@ This describes **multiple specialty agents** for different ML lifecycle stages P
 
 ### Layer 4 — ~16 infrastructure components
 
-Identity (P0 + RFC 8693) | 5-type sentinels via Anthropic PostToolUse hooks | OTel + 4-scope hybrid memory (Mem0/Letta) | Inspect AI + cross-family MultiJudge | **LangGraph durable supervisor + Magentic-One ledger** | ComputeBackend + sandbox 2-tier | reproducibility envelope (incl. CUDA versions) | nat deployment wrapper
+Identity (P0 + RFC 8693) | 5-type sentinels via Anthropic PostToolUse hooks | OTel + 4-scope hybrid memory (Mem0/Letta) | Inspect AI + cross-family MultiJudge | **LangGraph durable supervisor + Magentic-One ledger** | **Context engineering discipline** (cache-aware prompt structure + 75% compaction + just-in-time retrieval + cosmos-progress.md state file + behavior-vs-capability staleness check) | ComputeBackend + sandbox 2-tier | reproducibility envelope (incl. CUDA versions) | nat deployment wrapper
 
 ### Layer 5 — ml-intern primitives (LEVERAGED inside LangGraph worker nodes)
 

@@ -672,7 +672,7 @@ v5.2 ships the production governance layer that turns autonomous agents from res
 | **P0.5** | **0.6** | **Library restructure + harness adapters** *(✅ shipped)* | `cosmos_lab/` package + `install_into_session()` (D2) + `register_as_nat_tool()` (D3) + adapter contract (D4) | no |
 | **P1** | **2** | **Eval infrastructure** (foundation for EvalAgent + used by all workers) | `TrajectorySink` Protocol, `OTelGenAIEmitter` → Phoenix, **5 sentinel types** (incl. **JudgeHackingCheck** per Gaia2), **cross-family `MultiJudge`** (3× Sonnet + 1× non-Anthropic), Inspect AI bridge via Anthropic PostToolUse hooks contract, 5 seed Inspect tasks, `evaluate` CLI | no |
 | **P2** | **1** | **Cosmos toolset** (Cosmos-specific tools all workers use) | `NIMProvider` (litellm custom), `cosmos_reason`/`predict`/`transfer` tool wrappers, 5 cosmos Inspect tasks | no (mocked NIM) |
-| **P3** | **2** | **🤖 PrincipalAgent foundation (NEW supervisor agent)** | **LangGraph durable supervisor** + **Magentic-One Task Ledger (facts+plan) + Progress Ledger (step-tracking with 2-iteration stall detection)** + **4-scope hybrid memory** (user/agent/session/org) via Mem0 or Letta + Skills loader + sub-agent spawn coordinator. Foundation for ALL 4 workers. | no |
+| **P3** | **2.5** | **🤖 PrincipalAgent foundation + Context engineering discipline (NEW supervisor agent)** | **LangGraph durable supervisor** + **Magentic-One Task Ledger (facts+plan) + Progress Ledger (step-tracking with 2-iteration stall detection)** + **4-scope hybrid memory** (user/agent/session/org) via Mem0 or Letta + Skills loader + sub-agent spawn coordinator. **Plus context engineering discipline** (cache-aware prompt structure: stable prefix → tool defs → conversation; compaction strategy at 75% context utilization; just-in-time retrieval via `recall_relevant(goal)`; `cosmos-progress.md` structured state file for cross-session bridging — claude-progress.txt analog per Anthropic Claude Code pattern). Foundation for ALL 4 workers. | no |
 | **P4a** | **1.5** | **🤖 DataAgent (worker #1)** | Distinct cosmos-curate/NeMo Curator surface: composes Ray pipeline + LLM-in-the-loop persona-rewriter; **processes 10-100 hours real video** (Invariant 9); dataset card with W&B Artifacts lineage | ✅ (cosmos-curate Ray cluster) |
 | **P4b** | **2** | **Identity v2 — MCP OAuth + RFC 8707 + RFC 8693 + signed audit** | Per MCP 2026-03-15 spec (86% enterprise adoption); table stakes delegation + signed audit (Ed25519 v1, KMS in P10) — drop "earned trust escalation" framing per audit | no |
 | **P5** | **2** | **🤖 EvalAgent + 🤖 TrainOrchestrator (workers #2 + #3)** | EvalAgent (1w): leverages P1 eval infra; physics-consistency scorers; PR-gating; cross-family judges. TrainOrchestrator (1w): Centaur HPO; ComputeBackend; NeMo-RL; **first real GPU sweep** (Invariant 9) | ✅ (Inv 9) |
@@ -682,7 +682,7 @@ v5.2 ships the production governance layer that turns autonomous agents from res
 | **P8** | **1.5** | **GepaOptimizer (offline batch tool, NOT standing agent)** | Monthly cron: DSPy `dspy.GEPA` reflective text evolution over trajectory store; A/B test on Inspect AI golden suite; lower-CI ratchet → signed promotion record. Frontier-validated as offline only (Decagon pattern). | no |
 | **P9** | **1.5** | **MultimodalPipeline DEMO (orchestrate existing agents)** | NOT a new agent: PrincipalAgent orchestrates DataAgent → TrainOrchestrator → EvalAgent → OptimizeAgent on Cosmos Predict 2.5 + π₀.₅; **real Cosmos NIM endpoint** (Invariant 9). Demo proves the existing 5 agents compose cohesively. | ✅ (Inv 9: real Cosmos NIM ≥1×) |
 | **P10** | **2** | **CrossAgentEvaluator (offline) + production deploy + nat YAML + OSS PR + demo** | CrossAgentEvaluator quarterly batch: cosmos-lab vs Devin vs Claude Code vs human → Pareto frontier with **reward-hack rate axis** (per audit). Plus: HF Spaces / Modal endpoint ≥100 real user sessions; ≥1 upstream PR (nvidia-nat or Inspect AI); `pip install cosmos-lab[all]`; `nat run cosmos-lab.yaml` reference; KMS migration; 5-min demo video | yes (production) |
-| **Total** | **~21** | | **5 production agents + 1+ Skills + 3 offline tools + ~16 infra on LangGraph + Magentic-One + ml-intern primitives** | **5 phases real GPU** |
+| **Total** | **~21.5** | | **5 production agents + 1+ Skills + 3 offline tools + ~16 infra + context engineering discipline, on LangGraph + Magentic-One + ml-intern primitives** | **5 phases real GPU** |
 
 ---
 
@@ -1048,14 +1048,131 @@ cosmos_lab/principal/
 ├── executor.py            # EXECUTE phase: hands milestone to ml-intern agent_loop
 ├── verifier_gen.py        # auto-generates milestone verifiers from goal
 ├── replanner.py           # REPLAN phase: sentinel trip → new plan
-├── memory/
-│   ├── working.py         # in-task memory
-│   ├── episodic.py        # cross-task memory (DuckDB-backed for query)
-│   └── semantic.py        # distilled facts (file-based, GEPA-curated)
-└── capability_expansion.py  # earned-trust capability scope expansion
+├── memory/                # 4-scope hybrid (Mem0/Letta substrate)
+│   ├── working.py         # in-task memory (scope: session)
+│   ├── episodic.py        # cross-task memory (scope: agent + user)
+│   ├── semantic.py        # distilled facts (scope: org)
+│   └── compaction.py      # 75%-context-utilization compaction trigger
+├── context_eng/           # NEW (v7-stronger) — context engineering discipline
+│   ├── prompt_layout.py   # cache-aware structure: stable prefix → tool defs → conversation
+│   ├── jit_retrieval.py   # just-in-time recall_relevant(goal) tool
+│   ├── progress_state.py  # cosmos-progress.md cross-session bridging file
+│   └── stale_check.py     # behavior-vs-capability separation test (quarterly)
+└── capability_expansion.py  # RFC 8693 token-exchange delegation (drop "earned trust" framing)
 ```
 
 P3-P9 phases each ADD a capability domain to PrincipalAgent (data/eval/train/optimize/multimodal/code) — they're not separate agents, they're skill modules the same agent uses.
+
+### 3.2.8 Context engineering discipline (v7-stronger — addresses Tier 3 + JD stand-out #3)
+
+Context engineering is "the new prompt engineering" per Anthropic 2026 engineering blog. v7-stronger ships explicit discipline in P3 PrincipalAgent foundation, addressing both JD stand-out bullet #3 (context compression / agent memory) and the 8-tier audit Tier 3 gap.
+
+**Four context-engineering primitives** (all land in P3, ~2.5w):
+
+#### Primitive 1: Cache-aware prompt structure
+
+Layout for every PrincipalAgent + worker invocation:
+
+```
+[STABLE PREFIX — never changes during a task]
+  - System prompt
+  - Capability scope manifest (RFC 8693 token contents)
+  - Sentinel rules
+  - Memory tier configuration
+[TOOL DEFINITIONS — change only on RFC 8693 capability expansion event]
+  - All tool specs from current capability scope
+[VOLATILE — the only churn region]
+  - Magentic-One Task Ledger
+  - Magentic-One Progress Ledger
+  - Recent conversation turns (post-compaction)
+```
+
+**Why**: every byte of churn in the stable region voids the prefix cache (Anthropic memory system; Claude API prefix caching) and 10× cost. Production agents reuse system prompt + tool defs thousands of times across tool calls — prefix caching is the single biggest cost lever.
+
+**Owned path**: `cosmos_lab/principal/context_eng/prompt_layout.py` — enforces layout invariant at build time.
+
+#### Primitive 2: Compaction strategy at 75% context utilization
+
+Trigger: when context window hits 75% of model limit (e.g., 150K/200K for Claude Sonnet 4.6).
+
+Action:
+1. Pause agent loop
+2. Use Anthropic memory tool API to summarize older conversation history (preserves task context, drops verbose tool outputs)
+3. Replace older history with summary in next turn
+4. Resume
+
+**Why**: Anthropic context-editing pattern — auto-clears stale tool results when context fills. Claude Code uses this; we adopt it.
+
+**Owned path**: `cosmos_lab/principal/memory/compaction.py`
+
+#### Primitive 3: Just-in-time retrieval via `recall_relevant(goal)` tool
+
+Don't pre-load episodic memory at session start. Agent calls explicit tool when needed:
+
+```python
+# Tool def loaded by PrincipalAgent
+@tool
+def recall_relevant(goal: str, k: int = 5) -> list[Episode]:
+    """Recall past episodes relevant to current goal. 4-scope filtered."""
+    return episodic_memory.search(query=goal, scope=current_scope, k=k)
+```
+
+**Why**: pre-loading wastes context window on irrelevant past tasks. Just-in-time keeps stable prefix small AND lets agent fetch only what matters now.
+
+**Owned path**: `cosmos_lab/principal/context_eng/jit_retrieval.py`
+
+#### Primitive 4: Structured state files for cross-session bridging
+
+Per Anthropic Claude Code pattern (claude-progress.txt + git history bridges sessions):
+
+- PrincipalAgent writes `cosmos-progress.md` after every milestone completion
+- Format: append-only event log with structured sections (DONE / IN_PROGRESS / NEXT / SURPRISES)
+- New session begins by reading `cosmos-progress.md` BEFORE anything else (initializer pattern)
+- Bridges multi-day work across compute interruptions
+
+```markdown
+# cosmos-progress.md (auto-generated by PrincipalAgent)
+
+## Task: Improve Cosmos Reason 2 by 3pp
+## Started: 2026-05-04
+## Last update: 2026-05-06 (session #3)
+
+### DONE
+- Milestone 1: dataset inspection (sentinel-clean)
+- Milestone 2: baseline eval at 0.832 pass-rate
+
+### IN_PROGRESS
+- Milestone 3: experiment 1 (LR sweep) — 4/6 configs done
+
+### NEXT
+- Milestone 4: experiment 2 (data augmentation)
+
+### SURPRISES (drives REPLAN)
+- Eval task 4 has different schema than rest — added sentinel for this
+```
+
+**Owned path**: `cosmos_lab/principal/context_eng/progress_state.py`
+
+#### Primitive 5 (bonus): Behavior-vs-model-capability separation test
+
+Per Anthropic's "harness assumptions go stale as models improve" warning (Sonnet 4.5 context anxiety patches were dead weight in Opus 4.5).
+
+Quarterly automated test:
+1. Snapshot current PrincipalAgent + workers
+2. Re-run same suite against current model + previous model
+3. Detect harness assumptions that no longer hold (e.g., "context compaction at 50%" was for older model; new model needs only 75%)
+4. Flag dead-weight resets/patches for removal
+
+**Owned path**: `cosmos_lab/principal/context_eng/stale_check.py`
+
+#### New numerical commitments (extend §0.7 + AGENTIC_EVAL_SPEC §9)
+
+| # | Target | Commitment | How measured |
+|---|---|---|---|
+| **E15** | Prefix cache hit rate | **≥80% on stable prefix region** | Claude API cache_read_input_tokens metric, weekly |
+| **E16** | Compaction trigger reliability | **fires at 75% ± 5% context utilization, no missed triggers in 100 runs** | unit test fixture |
+| **E17** | Cosmos-progress.md cross-session recovery | **100% of resumed sessions correctly recover state from progress file** | resumption smoke test, every cross-session task |
+| **E18** | Behavior-vs-capability stale assumption detection | **≥1 stale assumption identified per quarterly retest** | quarterly retest report |
 
 ---
 
