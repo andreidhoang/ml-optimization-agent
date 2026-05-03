@@ -67,7 +67,22 @@ Ship `cosmos_lab/harness/CONTRACT.md` documenting the adapter contract that ALL 
 `./bin/verify.sh p0_5_d4` — checks: CONTRACT.md exists, test_adapter_contract.py exists, parametrized matrix passes for both adapters, P0.5 closes (D1+D2+D3+D4 all green).
 
 ### After D4 → P0.5 COMPLETE
-P0.5 ships in 4 days as planned. P1 starts: TrajectorySink + OTel-GenAI + Inspect AI + Sentinel taxonomy. PrincipalAgent v0 lands in P3.
+P0.5 ships in 4 days as planned. P1 starts: OTel observability + sentinel taxonomy + Inspect AI + MultiJudge — applied to ml-intern sessions via D2 adapter (governance wraps existing autonomous agent, no PrincipalAgent re-implementation per v5.2).
+
+### v5.2 schedule reminder (~10 more weeks after P0.5)
+
+Per PLAN_V2 §1 v5.2 phase table:
+- P1 (2w): OTel + sentinels + Inspect AI + MultiJudge
+- P2 (1w): Cosmos toolset for ml-intern
+- P3 (1w): Cross-session memory (3-tier)
+- P4 (3w): Identity v2 (MCP OAuth + RFC 8693 + signed audit)
+- P5 (1w): Real GPU run + measured eval
+- P6 (1w): GEPA self-improvement loop
+- P7 (1w): Capability expansion + S4 probe suite
+- P8 (1w): Cross-agent eval + production deploy
+- P9 (1w): Polish + nat YAML + OSS PR + demo
+
+No PrincipalAgent re-implementation work — ml-intern already provides the autonomous agent.
 
 ---
 

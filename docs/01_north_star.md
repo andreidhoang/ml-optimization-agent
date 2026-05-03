@@ -1,68 +1,68 @@
-# North Star — cosmos-lab in 1 screen (v5)
+# North Star — cosmos-lab in 1 screen (v5.2)
 
 ## What we are building
 
-**One exceptional autonomous principal agent** that does long-horizon ML lifecycle work the way a real principal engineer does — taking vague research questions, decomposing them into experiments, writing real code, running real GPU workloads, observing surprising results, replanning when sentinels trip, and delivering measured outcomes. All within an exceptional self-managed context harness, governed by sentinels that compound trust over time.
+**The production governance layer that makes ml-intern (or any autonomous ML agent) safe to deploy at NVIDIA Cosmos scale.**
 
-Built on ml-intern's `agent_loop.py` as substrate. Runs natively on `nvidia-nat`.
+Two components:
+1. **ml-intern** — already a fully-autonomous ML engineering agent (HF's product). Has planning (`plan_tool`), sub-agent spawning (`research_tool`), 20+ ML tools, sandbox, HF integration, doom-loop detection. Leveraged AS-IS.
+2. **cosmos-lab** — what we ship: 10 production-governance components ml-intern doesn't have.
 
 ## Why we are building it
 
-NVIDIA Cosmos team JD: *"AI doesn't just run models but helps build them."* "Strong agency in LLM-based systems, code agents doing real work."
+NVIDIA Cosmos team JD: *"AI doesn't just run models but helps build them."* "Strong agency in LLM-based systems." "Design and scale evaluation platforms."
 
-In 2026, the agentic frontier IS autonomous capability — Devin, Operator, Cursor Composer, Claude Code. The differentiator that makes cosmos-lab L6-grade vs commodity isn't "we wrap autonomous agents in a governance layer" (that's CI for agents — table stakes). The differentiator is **exceptional autonomy made safe** — sentinels as tripwires for replanning (not gates), capability scope expanding with earned track record, OTel trajectory as long-horizon memory.
+In 2026, autonomous agents are commoditizing (Devin, Operator, Claude Code, ml-intern, Cursor Composer all exist). What's NOT commoditized — what NVIDIA Cosmos team specifically needs for production deployment — is the **governance layer** that makes these agents safe + auditable + improvable. cosmos-lab fills that gap.
 
-## The PrincipalAgent
+## The 10 governance components cosmos-lab adds
 
-One agent. Six capability domains it demonstrates over P3-P9. Same agent, six skills. Like one principal engineer who does data work Monday, training Tuesday, optimization Wednesday — not six different specialists.
+| # | Component | What ml-intern has | What cosmos-lab adds |
+|---|---|---|---|
+| 1 | Sentinel-gated quality | basic eval | 4 sentinel types paired with judge — no judge-only metric reaches a gate |
+| 2 | Cross-session memory | per-session `logged_events` | 3-tier (working/episodic/semantic) persistent memory |
+| 3 | RFC 8693 capability expansion | static `tool_router` scope | Earned-trust expansion via token exchange |
+| 4 | Hash-chained signed audit | basic JSON logging | Tamper-evident; EU AI Act Art. 12 compliant |
+| 5 | OTel-GenAI native observability | HF telemetry | `gen_ai.*` semconv; portable to any backend |
+| 6 | GEPA self-improvement | none | DSPy 3.x offline pass; ratchet on lower-CI improvement |
+| 7 | MultiJudge with bootstrap CIs | ad-hoc | N=3 judges; no debate dynamics |
+| 8 | Inspect AI integration | none | UK AISI standard adoption |
+| 9 | PR-gating + canary deployment | none | Block regressions; sequential testing |
+| 10 | AGENTIC_EVAL_SPEC discipline | none | Full eval architecture (T0-T4 + S1-S6 + E1-E10) |
 
-| Capability | Phase | Real work |
-|---|---|---|
-| **Data curation** | P3 | Process 10-100 hours of real video through cosmos-curate, ship dataset card with full lineage |
-| **Eval design** | P4a | Design multi-judge eval with bootstrap CIs + reward-hack sentinels, gate PRs |
-| **Training orchestration** | P5 | Centaur HPO sweep on real GPU (Modal/Lambda), pick winner with statistical justification |
-| **PyTorch optimization** | P5.5 + P6 | Custom autograd op or torch.compile pattern, ≥10% wall-clock improvement; ≥1.5× speedup on 4 real workloads |
-| **Multimodal pipeline** | P9a | E2E pipeline on real Cosmos NIM endpoint, < 8h wall-clock |
-| **Code work** | P9b | Real OSS bug fixes on real GitHub issues (capability scope earned in P3-P9a) |
+## The demonstration
 
-## The three pillars (each "exceptional," not "adequate")
+```bash
+$ ml-intern --task "Improve Cosmos Reason 2 by 3pp" \
+            --cosmos-lab-governance \
+            --identity researcher@cosmos \
+            --budget $400 \
+            --timeout 1week
+```
 
-**1. Long-horizon autonomous reasoning** — multi-day work persisting across sessions via OTel trajectory + episodic memory; PLAN→EXECUTE→VERIFY→REPLAN loop; resume mid-experiment after compute interruption.
+What happens:
+- ml-intern's autonomous agent runs the actual ML work (planning, experimentation, training, evaluation)
+- cosmos-lab governance wraps every step: identity check + sentinel evaluation + OTel span emission + signed audit log
+- Cross-session memory persists across compute interruptions
+- Capability scope expands when sentinel-clean runs accumulate
+- Weekly GEPA pass mines trajectory for prompt-revision candidates
 
-**2. Exceptional context harness (agent-managed)** — 3-tier memory (working/episodic/semantic), self-edited current state, self-written verifiers, trajectory store as replay buffer, pointer index agent maintains.
-
-**3. Governance as enabler (not fence)** — sentinels are tripwires (trip → structured feedback → agent replans, not blocks); capability scope expands with earned trust (RFC 8693 token exchange after K sentinel-clean runs); audit log = replay buffer not just compliance artifact; GEPA = agent self-improvement.
-
-## What makes this exceptional vs 2026 baseline (Devin/Operator/Cursor/Claude Code)
-
-1. **ML-lifecycle-native tools** — full ML stack (cosmos-curate, NeMo-RL, SkyPilot, NIM, W&B, Inspect AI, profilers) as one tool registry
-2. **Long-horizon by construction** — multi-day persistence via OTel + episodic memory (most 2026 agents are session-bounded)
-3. **Sentinel-gated replanning** instead of silent failure — 4 sentinel types cover Berkeley/METR failure modes
-4. **Earned-trust capability expansion** via RFC 8693 — narrow start, broaden with track record
-5. **`nat`-runnable + OTel-GenAI-native** — drops into Cosmos team's stack with one command
-
-## The 5 production gates (Invariant 9 + §0.8)
-
-- **G1**: Real GPU runs (~$200-400 budget across P5/P5.5/P6/P9a)
-- **G2**: PyTorch depth artifact — P5.5 ≥10% wall-clock improvement on real workload
-- **G3**: Real production deployment — P10 ≥100 user sessions over 1-week window
-- **G4**: Real multimodal data — P3 10-100 hours real video processed
-- **G5**: Upstream OSS PR — P10 ≥1 review-ready PR to nvidia-nat or Inspect AI
-
-## The demo (this is the product)
-
-Cosmos hiring manager opens cosmos-lab and says: *"Take this Cosmos Reason 2 task. Improve pass-rate ≥3pp. One week, $400 budget."*
-
-PrincipalAgent runs unattended ~5 days. Delivers: measured pass-rate improvement (with p-value + sentinel agreement), full Inspect View replay log, full OTel trajectory, W&B sweep showing winners and losers, 1-page report explaining hypothesis + what worked + what didn't, cost report.
-
-That's **AI helping build AI** in production. Not orchestrating. Not gating. *Doing the work.*
+End of week: measured pass-rate +3pp (with bootstrap CI + p-value + sentinel agreement), full Phoenix trajectory, signed audit log, cost report ($383/$400).
 
 ## Schedule
 
-22.5 weeks. 13 phases (P0 + P0.5 shipped, P1-P10 ahead). See `PLAN_V2.md §1` for full table, `docs/03_pointers.md` for phase → anchor map.
+~13 weeks. P0 + P0.5 (~3 days work) shipped. ~10 weeks remaining for P1-P9 governance enhancements + production deployment.
 
-## When done (Week 22.5)
+Compressed from v5/v5.1's 22.5 weeks because v5.2 doesn't re-implement what ml-intern already has (planner, executor, memory tier internals, sub-agent spawning).
 
-A Cosmos hiring manager opens the repo and in 5 minutes sees: README → `pip install cosmos-lab[nat]` → `nat run cosmos-lab.yaml` → PrincipalAgent solving a fresh ML task end-to-end → 6 demonstrated capabilities with measured numbers → upstream PR linked → production endpoint dashboard with real users → signed audit log → demo video.
+## When done (Week ~13)
 
-> *"AI helps build AI"* — in production, by an agent that reasons, plans, executes, observes, replans, and ships.
+A Cosmos hiring manager opens the repo and in 5 minutes sees:
+- README → `pip install cosmos-lab[nat]` → `nat run cosmos-lab.yaml`
+- ml-intern + cosmos-lab solving a fresh Cosmos task end-to-end
+- 10 governance components live with measured numbers
+- Upstream OSS PR linked
+- Production endpoint dashboard with real users
+- Signed audit log
+- 5-minute demo video
+
+> *"AI helps build AI"* — autonomous agent (ml-intern) + production governance (cosmos-lab) = deployable ML lifecycle automation for Cosmos team.
