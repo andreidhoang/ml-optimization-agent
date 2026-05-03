@@ -67,22 +67,25 @@ Ship `cosmos_lab/harness/CONTRACT.md` documenting the adapter contract that ALL 
 `./bin/verify.sh p0_5_d4` — checks: CONTRACT.md exists, test_adapter_contract.py exists, parametrized matrix passes for both adapters, P0.5 closes (D1+D2+D3+D4 all green).
 
 ### After D4 → P0.5 COMPLETE
-P0.5 ships in 4 days as planned. P1 starts: OTel observability + sentinel taxonomy + Inspect AI + MultiJudge — applied to ml-intern sessions via D2 adapter (governance wraps existing autonomous agent, no PrincipalAgent re-implementation per v5.2).
+P0.5 ships in 4 days as planned. P1 starts: eval infrastructure (sentinels + OTel + Inspect AI + MultiJudge) — foundation for EvalAgent (P4a) and supporting all other specialty agents.
 
-### v5.2 schedule reminder (~10 more weeks after P0.5)
+### v6 schedule reminder (~17 more weeks after P0.5)
 
-Per PLAN_V2 §1 v5.2 phase table:
-- P1 (2w): OTel + sentinels + Inspect AI + MultiJudge
-- P2 (1w): Cosmos toolset for ml-intern
-- P3 (1w): Cross-session memory (3-tier)
-- P4 (3w): Identity v2 (MCP OAuth + RFC 8693 + signed audit)
-- P5 (1w): Real GPU run + measured eval
-- P6 (1w): GEPA self-improvement loop
-- P7 (1w): Capability expansion + S4 probe suite
-- P8 (1w): Cross-agent eval + production deploy
-- P9 (1w): Polish + nat YAML + OSS PR + demo
+Per PLAN_V2 §1 v6 phase table:
+- P1 (2w): Eval infrastructure (sentinels, OTel, Inspect AI, MultiJudge — foundation for EvalAgent + used by all)
+- P2 (1w): Cosmos toolset (NIMProvider + tool wrappers — used by all specialty agents)
+- **P3 (1.5w): 🤖 DataAgent** (Cosmos-specialty agent #1)
+- **P4a (1w): 🤖 EvalAgent** (Cosmos-specialty agent #2)
+- P4b (2w): Identity v2 (MCP OAuth + RFC 8693 + signed audit — substrate for capability expansion)
+- **P5 (1.5w): 🤖 TrainOrchestrator** (Cosmos-specialty agent #3 — first real GPU run)
+- P5.5 (1w): PyTorch depth artifact
+- **P6 (1.5w): 🤖 OptimizeAgent** (Cosmos-specialty agent #4)
+- **P7 (1w): 🤖 CapabilityProbe** (governance agent #1) + 3-tier memory
+- **P8 (2w): 🤖 GepaOptimizer** (governance agent #2)
+- **P9 (2w): 🤖 MultimodalPipelineAgent + CodeAgent** (Cosmos-specialty agents #5 + #6)
+- **P10 (2w): 🤖 CrossAgentEvaluator** (governance agent #3) + production deploy + nat YAML + OSS PR + demo
 
-No PrincipalAgent re-implementation work — ml-intern already provides the autonomous agent.
+Total: 9 NEW agents (6 specialty + 3 governance) + ~16 infrastructure components. Built on ml-intern's tool primitives leveraged AS-IS.
 
 ---
 

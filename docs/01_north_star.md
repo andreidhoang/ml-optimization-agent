@@ -1,68 +1,77 @@
-# North Star — cosmos-lab in 1 screen (v5.2)
+# North Star — cosmos-lab in 1 screen (v6)
 
 ## What we are building
 
-**The production governance layer that makes ml-intern (or any autonomous ML agent) safe to deploy at NVIDIA Cosmos scale.**
+**9 NEW agents specialized for NVIDIA Cosmos team's ML lifecycle work, with production governance, built on ml-intern's tool primitives.**
 
-Two components:
-1. **ml-intern** — already a fully-autonomous ML engineering agent (HF's product). Has planning (`plan_tool`), sub-agent spawning (`research_tool`), 20+ ML tools, sandbox, HF integration, doom-loop detection. Leveraged AS-IS.
-2. **cosmos-lab** — what we ship: 10 production-governance components ml-intern doesn't have.
+Three layers:
+1. **6 Cosmos-specialty agents** — DataAgent, EvalAgent, TrainOrchestrator, OptimizeAgent, MultimodalPipelineAgent, CodeAgent
+2. **3 governance agents** — GepaOptimizer (self-improvement), CapabilityProbe (adversarial security), CrossAgentEvaluator (vendor comparison)
+3. **~16 governance infrastructure components** — sentinels, identity v2, audit log, OTel emitter, memory tiers, Inspect AI bridge, ComputeBackend, etc.
+
+All built on **ml-intern's tool primitives** (agent_loop blocks, 16 generic tools, sandbox, MCP, cost estimation, doom-loop detection) leveraged AS-IS — not reimplemented.
 
 ## Why we are building it
 
-NVIDIA Cosmos team JD: *"AI doesn't just run models but helps build them."* "Strong agency in LLM-based systems." "Design and scale evaluation platforms."
+NVIDIA Cosmos team JD literally asks: *"Create self-improving loops where agents (plural) help generate data, surface failures, evaluate outputs"* + stand-out *"agent-based systems doing real work — coding, eval, data gen, triage, experimentation, orchestration"*.
 
-In 2026, autonomous agents are commoditizing (Devin, Operator, Claude Code, ml-intern, Cursor Composer all exist). What's NOT commoditized — what NVIDIA Cosmos team specifically needs for production deployment — is the **governance layer** that makes these agents safe + auditable + improvable. cosmos-lab fills that gap.
+This describes **multiple specialty agents for different ML lifecycle stages** — not one PrincipalAgent (v5/v5.1 over-correction), not zero agents with just governance (v5.2 over-correction), but multiple specialty agents + governance.
 
-## The 10 governance components cosmos-lab adds
+Plus 2026 reward-hacking crisis (METR + UC Berkeley) means specialty agents need sentinels + signed audit + capability expansion + GEPA self-improvement to be production-deployable.
 
-| # | Component | What ml-intern has | What cosmos-lab adds |
-|---|---|---|---|
-| 1 | Sentinel-gated quality | basic eval | 4 sentinel types paired with judge — no judge-only metric reaches a gate |
-| 2 | Cross-session memory | per-session `logged_events` | 3-tier (working/episodic/semantic) persistent memory |
-| 3 | RFC 8693 capability expansion | static `tool_router` scope | Earned-trust expansion via token exchange |
-| 4 | Hash-chained signed audit | basic JSON logging | Tamper-evident; EU AI Act Art. 12 compliant |
-| 5 | OTel-GenAI native observability | HF telemetry | `gen_ai.*` semconv; portable to any backend |
-| 6 | GEPA self-improvement | none | DSPy 3.x offline pass; ratchet on lower-CI improvement |
-| 7 | MultiJudge with bootstrap CIs | ad-hoc | N=3 judges; no debate dynamics |
-| 8 | Inspect AI integration | none | UK AISI standard adoption |
-| 9 | PR-gating + canary deployment | none | Block regressions; sequential testing |
-| 10 | AGENTIC_EVAL_SPEC discipline | none | Full eval architecture (T0-T4 + S1-S6 + E1-E10) |
+## The 9 agents
+
+### Layer 1 — 6 Cosmos-specialty agents (ML lifecycle work)
+
+| Agent | Phase | Real work |
+|---|---|---|
+| **DataAgent** | P3 | Curate 10-100 hours real video through cosmos-curate; ship dataset card with W&B Artifacts lineage |
+| **EvalAgent** | P4a | Multi-judge with bootstrap CIs + reward-hack sentinels; physics-consistency scorers; PR-gating |
+| **TrainOrchestrator** | P5 | Centaur HPO; ComputeBackend over SkyPilot/NeMo-Run/HF Jobs; NeMo-RL post-training; real GPU sweep |
+| **OptimizeAgent** | P6 | Profile workload + apply optimization; ≥1.5× speedup on 4 real workloads, ≤2% regression |
+| **MultimodalPipelineAgent** | P9 | E2E Cosmos workflow on Predict 2.5 + π₀.₅; real Cosmos NIM endpoint |
+| **CodeAgent** | P9 | Capability-scoped {read_file, write_file, run_tests, git_diff}; real OSS bug fixes |
+
+### Layer 2 — 3 governance agents (meta-layer)
+
+| Agent | Phase | What it does |
+|---|---|---|
+| **GepaOptimizer** | P8 | Weekly: mine failures → DSPy GEPA prompt revisions → A/B test → signed promotion |
+| **CapabilityProbe** | P7 | Adversarial: red-team capability scope before each expansion event |
+| **CrossAgentEvaluator** | P10 | Quarterly: spawn ml-intern+cosmos-lab vs Devin vs Claude Code vs human on identical task; Pareto chart |
 
 ## The demonstration
 
+Cosmos team uses cosmos-lab via nat workflow:
+
 ```bash
-$ ml-intern --task "Improve Cosmos Reason 2 by 3pp" \
-            --cosmos-lab-governance \
-            --identity researcher@cosmos \
-            --budget $400 \
-            --timeout 1week
+$ nat run cosmos-lab.yaml --task "Improve Cosmos Reason 2 by 3pp"
 ```
 
 What happens:
-- ml-intern's autonomous agent runs the actual ML work (planning, experimentation, training, evaluation)
-- cosmos-lab governance wraps every step: identity check + sentinel evaluation + OTel span emission + signed audit log
+- DataAgent prepares data → TrainOrchestrator runs sweep on real GPU → EvalAgent scores → OptimizeAgent compresses winner → MultimodalPipelineAgent orchestrates the e2e workflow
+- Background: GepaOptimizer mines for prompt improvements; CapabilityProbe tested scope before this run; CrossAgentEvaluator records data for next quarterly Pareto
+- Each specialty agent uses ml-intern session + scoped CapabilityScopedRouter + sentinel paired evaluation + OTel span emission + signed audit log entry
 - Cross-session memory persists across compute interruptions
-- Capability scope expands when sentinel-clean runs accumulate
-- Weekly GEPA pass mines trajectory for prompt-revision candidates
 
-End of week: measured pass-rate +3pp (with bootstrap CI + p-value + sentinel agreement), full Phoenix trajectory, signed audit log, cost report ($383/$400).
+Final: measured pass-rate +4.2pp (with bootstrap CI + p-value + sentinel agreement), full Phoenix trajectory across all 6 specialty agents, signed audit log, cost report ($383/$400).
 
 ## Schedule
 
-~13 weeks. P0 + P0.5 (~3 days work) shipped. ~10 weeks remaining for P1-P9 governance enhancements + production deployment.
+~19 weeks. P0 + P0.5 (~3 days work) shipped. ~17 weeks remaining for P1-P10.
 
-Compressed from v5/v5.1's 22.5 weeks because v5.2 doesn't re-implement what ml-intern already has (planner, executor, memory tier internals, sub-agent spawning).
+Between v5/v5.1's 22.5w (too long — included reimplementation) and v5.2's 13w (too short — removed agents JD asks for). v6 is honest middle ground.
 
-## When done (Week ~13)
+## When done (Week ~19)
 
-A Cosmos hiring manager opens the repo and in 5 minutes sees:
+A Cosmos hiring manager opens the repo and sees:
 - README → `pip install cosmos-lab[nat]` → `nat run cosmos-lab.yaml`
-- ml-intern + cosmos-lab solving a fresh Cosmos task end-to-end
-- 10 governance components live with measured numbers
-- Upstream OSS PR linked
+- 6 specialty agents + 3 governance agents + ~16 infrastructure components
+- ml-intern's tool primitives leveraged as substrate (no reimplementation)
+- Real GPU runs with measured numbers (Invariant 9)
+- Real OSS upstream PR (P10)
 - Production endpoint dashboard with real users
 - Signed audit log
-- 5-minute demo video
+- 5-minute demo video showing all 9 agents in action
 
-> *"AI helps build AI"* — autonomous agent (ml-intern) + production governance (cosmos-lab) = deployable ML lifecycle automation for Cosmos team.
+> *"AI helps build AI"* — 6 specialty agents doing real Cosmos work + 3 governance agents keeping them safe + production infrastructure that lets you deploy them.
