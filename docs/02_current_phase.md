@@ -114,22 +114,27 @@ Ship the eval infrastructure: `TrajectorySink` Protocol, `OTelGenAIEmitter` (Pho
 
 ---
 
-## After P1 → P2 (Cosmos toolset for specialty agents to use)
+## After P1 → v7 phase progression (frontier-aligned final)
 
-Per PLAN_V2 §1 v6 phase table:
-- P2 (1w): NIMProvider + Cosmos toolset (cosmos_reason/predict/transfer wrappers)
-- **P3 (1.5w): 🤖 DataAgent** ← FIRST specialty agent ships
-- P4a (1w): 🤖 EvalAgent
-- P4b (2w): Identity v2 (MCP OAuth + RFC 8693 + signed audit)
-- P5 (1.5w): 🤖 TrainOrchestrator (first real GPU run)
+> **v7 update**: 3-audit frontier verification confirmed v6 was ~60% aligned with 6 specific issues. v7 fixes them. See PLAN_V2.md §0.5 row 14 for cited rationale.
+
+Per PLAN_V2 §1 v7 phase table:
+- P1 (2w): Eval infra — **5 sentinel types** (incl. judge-hacking per Gaia2), **cross-family MultiJudge** (3× Sonnet + 1× non-Anthropic), Inspect AI bridge via Anthropic PostToolUse hooks contract
+- P2 (1w): Cosmos toolset (NIMProvider + cosmos_reason/predict/transfer wrappers)
+- **P3 (2w): 🤖 PrincipalAgent foundation (NEW v7)** — LangGraph durable supervisor + Magentic-One Task/Progress Ledger pattern + 4-scope hybrid memory (Mem0/Letta)
+- **P4a (1.5w): 🤖 DataAgent** (worker #1)
+- P4b (2w): Identity v2 (MCP OAuth + RFC 8707 + RFC 8693 + signed audit; standard delegation only)
+- **P5 (2w): 🤖 EvalAgent + 🤖 TrainOrchestrator** (workers #2 + #3 — first real GPU run)
 - P5.5 (1w): PyTorch depth artifact
-- P6 (1.5w): 🤖 OptimizeAgent
-- P7 (1w): 🤖 CapabilityProbe + 3-tier memory
-- P8 (2w): 🤖 GepaOptimizer
-- P9 (2w): 🤖 MultimodalPipelineAgent + CodeAgent
-- P10 (2w): 🤖 CrossAgentEvaluator + production deploy + nat YAML + OSS PR + demo
+- **P6 (1.5w): 🤖 OptimizeAgent** (worker #4)
+- **P7 (1w): CodeWork Skill** (Anthropic Skills pattern, NOT separate agent) + **CapabilityProbe in CI/CD lane** (NOT standing agent)
+- **P8 (1.5w): GepaOptimizer offline batch tool** (NOT standing agent — Decagon pattern)
+- **P9 (1.5w): MultimodalPipeline DEMO** (orchestrate existing 4 workers via PrincipalAgent on real Cosmos NIM endpoint)
+- **P10 (2w): CrossAgentEvaluator offline + production deploy + nat YAML + OSS PR + demo**
 
-**~17 weeks of agent + governance work after P0.5 completion.**
+**~18 weeks of agent + governance work after P0.5 completion.**
+
+**v7 final agent count**: 5 production agents (1 PrincipalAgent supervisor + 4 specialty workers) + 1+ Skills (CodeWork) + 3 OFFLINE governance tools (NOT standing agents per frontier convergence). Total: 5 production + Skills + offline tools + ~16 infrastructure on LangGraph + Magentic-One + ml-intern primitives.
 
 ---
 

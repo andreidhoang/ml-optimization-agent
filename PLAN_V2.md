@@ -1,8 +1,17 @@
-# PLAN_V2 — Cosmos-specialized ML lifecycle agents + production governance
+# PLAN_V2 — Frontier-aligned production agentic system for ML lifecycle
 
-> **Status**: Revision **v6** (Restore specialty agents with leverage discipline + production rigor) as of 2026-05-03. Supersedes PLAN.md for sequencing; PLAN.md retained as deep-reference for optimization-vertical detail.
+> **Status**: Revision **v7 (final)** (3-audit frontier verification pivot) as of 2026-05-03. Supersedes PLAN.md for sequencing; PLAN.md retained as deep-reference for optimization-vertical detail.
 >
-> **One-line v6 north star**: cosmos-lab ships **6 Cosmos-specialized ML lifecycle agents** (DataAgent, EvalAgent, TrainOrchestrator, OptimizeAgent, MultimodalPipelineAgent, CodeAgent) + **3 governance agents** (GepaOptimizer, CapabilityProbe, CrossAgentEvaluator) + **~16 production governance infrastructure components** (sentinels, identity v2, audit log, OTel emitter, memory tiers, Inspect AI bridge, ComputeBackend, etc.) — all **built on ml-intern's tool primitives** (agent_loop building blocks, 16 generic tools, sandbox, MCP, cost estimation, doom-loop detection) **leveraged AS-IS, not reimplemented**. Demonstrated on Cosmos Reason 2 / Predict 2.5 workflows end-to-end. **9 NEW agents + ~16 infrastructure = the cosmos-lab product. ml-intern primitives = the substrate.**
+> **One-line v7 north star**: cosmos-lab is a frontier-aligned production agentic system shipping **5 agents** (1 PrincipalAgent supervisor + 4 specialty workers with distinct tool surfaces: Data, Eval, Train, Optimize) + **CodeWork Skill** + **3 offline tools** (GepaOptimizer, CapabilityProbe, CrossAgentEvaluator — explicitly NOT standing agents per frontier convergence) + **~16 production governance infrastructure components** (5 sentinel types incl. judge-hacking detector, cross-family MultiJudge, MCP OAuth+RFC 8693, hash-chained signed audit, OTel-GenAI, 4-scope hybrid memory via Mem0/Letta, Inspect AI bridge, **LangGraph durable substrate**, **Magentic-One Task/Progress Ledger pattern**), built on ml-intern's tool primitives. Deployed via `nat run cosmos-lab.yaml`.
+>
+> **Revision history (with audit-confirmed verdicts)**:
+> - v3.1 / v3.2 / v4: 6 specialty agents on ml-intern (✅ correct on agent count, ⚠️ pre-frontier-audit)
+> - v5 / v5.1: 1 PrincipalAgent collapse (❌ over-correction #1 — too few agents)
+> - v5.2: 0 new agents, governance only (❌ over-correction #2 — too few agents, removed JD's required specialty agents)
+> - v6: 6 specialty + 3 governance agents on ml-intern (⚠️ ~60% frontier-aligned per 3-audit verification, 6 specific issues)
+> - **v7 (current, final)**: synthesizes 3 parallel audits of Anthropic + NVIDIA + LangGraph + Microsoft Agent Framework + 2026 production patterns. Fixes 6 v6 issues (Anthropic Skills convergence, GEPA offline-only, sentinels via PostToolUse hooks, 4-scope memory model, CapabilityProbe → CI/CD lane, drop "earned trust" framing). Adds 8 frontier patterns (LangGraph durable, Magentic-One ledgers, judge-hacking sentinel, cross-family MultiJudge, CodeWork Skill, RFC 8707+8693 day-one, reward-hack Pareto axis, CUDA versions in envelope).
+>
+> **Why v7 is final — confidence anchor**: 3 independent senior-engineer research agents conducted parallel audits of (a) Anthropic + NVIDIA frontier patterns, (b) 2026 multi-agent orchestration convergence, (c) production agent eval + governance + safety frontier. Each audit returned ~1500 words of findings with primary-source citations (Anthropic engineering blog, NVIDIA developer blog, GitHub repos, METR/UC Berkeley reward-hacking studies, MCP authorization spec, EU AI Act enforcement timeline, ICLR/NeurIPS papers with dates). All 3 audits converged on the same 6 fixes + 8 additions. v7 ships the synthesis. Future audit findings document as v1.1+ work, not v8 — process needs to converge.
 >
 > **Revision history (with honest postmortem)**:
 > - v3.1: §0.6 unique value, §0.7 numerical targets, §3.1 sentinel taxonomy, P9b CodeAgent
@@ -325,6 +334,7 @@ A 2026 SOTA verification pass produced eight load-bearing changes (rows 1-8 belo
 | **11** | **Autonomous principal-agent thesis pivot (v5)** — collapses v4's "6 thin orchestrator agents on a governance library" → **ONE PrincipalAgent demonstrating 6 capability domains**, with library + sentinels + identity reframed as *enablers of autonomy* (not constraints). Sentinels become tripwires for replanning. Identity capabilities expand with earned track record. GEPA becomes agent self-improvement (retroactive human review). Built on ml-intern's `agent_loop.py` substrate. **NEW §0.9 Autonomous Principal Agent thesis**, **NEW §3.2 PrincipalAgent architecture**, **§0.65 reframed** (six agents → six capability domains of one agent). | The v4 framing "we built a governance library wrapping other people's agents" *under-delivered* on JD's literal asks: "strong agency," "code agents doing real work," "AI helps build them." A NVIDIA Cosmos reviewer comparing cosmos-lab against 2026 production autonomous agents (Devin / Operator / Cursor Composer / Claude Code) saw v4 as conservative governance theater — clever judgment, weak capability. The 2026 agentic frontier is autonomous capability MADE SAFE by governance, not governance INSTEAD OF capability. v5 inverts the hierarchy: PrincipalAgent is the product; harness + sentinels + identity exist to make autonomy exceptional, not to substitute for it. Real principal engineers have one self with broad skills, not six narrow specialists — PrincipalAgent models that reality. | Reframes §0.6 + §0.65; adds §0.9 + §3.2; phase narratives shift from "ship N agents" to "PrincipalAgent demonstrates capability N"; ml-intern `agent_loop.py` graduated from compat shim to primary substrate; weeks unchanged (~22.5w) — depth shifts from breadth-across-agents to depth-per-capability |
 | **12** | **Honest leverage pivot (v5.2)** — audit of ml-intern revealed it's already a fully autonomous ML engineering agent (system_prompt_v3.yaml: *"fully autonomous — research, validate, implement, and deliver results"*) with planning (`agent/tools/plan_tool.py`), sub-agent spawning (`agent/tools/research_tool.py`: *"Research subagent tool — spawns a cheap LLM call with a focused research task"*), 20+ ML tools (jobs, datasets, papers, github, hf_repo, sandbox, notebook, ...), doom-loop detection, cost tracking, HF Jobs/Hub/Spaces integration. v5/v5.1 planned to re-implement these under `cosmos_lab/principal/` — clear duplication. v5.2 returns to v4's correct framing direction (governance layer) with v5's production rigor: cosmos-lab adds the **10 governance components** ml-intern doesn't have (sentinels, cross-session memory, RFC 8693 expansion, signed audit, OTel-GenAI, GEPA, MultiJudge, Inspect AI, PR-gating, AGENTIC_EVAL_SPEC discipline). | The v5/v5.1 pivot was over-correction. v4's governance-layer framing was directionally right but I criticized it as "weak capability" without realizing the autonomous agent ALREADY EXISTS in ml-intern. The right product is governance layer ON TOP of the autonomous agent — not replacement. 2026 reality: autonomous agents are commoditizing (Devin / Operator / Claude Code / ml-intern); production governance is the unmet need. Anti-pattern #4 (workflow): "Building a pipeline that should have been one model call" → generalized: "Building a 5000-LOC PrincipalAgent re-implementation that should have been a governance wrapper around an existing autonomous agent." | Header reframed (governance layer); §0.6 reframed (10 governance items); §0.65 reframed (6 governance enhancements, not 6 PrincipalAgent capabilities); §0.9 simplified (ml-intern is the agent); §1 phase table compressed 22.5w → ~13w; §3.2 reframed (cosmos-lab governance architecture, not PrincipalAgent re-implementation); all shipped code (P0, P0.5 D1/D2/D3, AGENTIC_EVAL_SPEC) preserved AS-IS — they are the governance foundation. |
 | **13** | **Restore specialty agents pivot (v6)** — v5.2's "0 new agents, just governance" was over-correction #2. JD re-read carefully: *"Create self-improving loops where agents (plural) help generate data, surface failures, evaluate outputs"* + stand-out *"agent-based systems doing real work: coding, eval, data gen, triage, experimentation, orchestration"* — describes MULTIPLE SPECIALTY AGENTS for different lifecycle stages. ml-intern's tools are HF-generic (good for HF use); Cosmos team needs Cosmos-specialized agents (cosmos-curate, NeMo-RL, NIM, multimodal physics, real video pipelines). v6 restores **6 specialty agents** (DataAgent / EvalAgent / TrainOrchestrator / OptimizeAgent / MultimodalPipelineAgent / CodeAgent) + **3 governance agents** (GepaOptimizer / CapabilityProbe / CrossAgentEvaluator) + ~16 infrastructure components, **built on ml-intern's tool primitives** (agent_loop blocks, 16 generic tools, sandbox, MCP, cost estimation, doom-loop) used as **SUBSTRATE not as the agents themselves**. | v5.2 conflated "ml-intern has tools and an agent loop" with "ml-intern is the agents we need." Wrong inference. ml-intern provides building blocks; cosmos-lab specializes them into Cosmos-aligned agents that the JD literally asks for. v4 was directionally right on agent count (6 specialty); v5/v5.1 over-collapsed; v5.2 over-removed. v6 is the synthesis: 6 specialty + 3 governance agents + leverage discipline (use ml-intern primitives, don't reimplement) + production rigor (real GPU, OSS PR, AGENTIC_EVAL_SPEC, sentinel taxonomy). | Header reframed (Cosmos-specialized agents + governance); §0.6 reframed (vs assembled OSS — 9 agents + governance); §0.65 reframed (6 specialty + 3 governance = 9 agents); §0.9 reframed (cosmos-lab builds agents on ml-intern primitives); §1 phase table — schedule ~19w with 9-agent reality; all v5.2 shipped code (P0, P0.5 D1/D2/D3, AGENTIC_EVAL_SPEC) preserved AS-IS — they are the foundation specialty agents will use. |
+| **14** | **Frontier-audit pivot (v7 — final)** — 3 parallel senior-engineer research agents audited (a) Anthropic + NVIDIA 2026 patterns, (b) 2026 multi-agent orchestration convergence (LangGraph + AutoGen→MAF migration + OpenAI Agents SDK + Mastra), (c) 2026 production agent eval + governance + safety frontier. All 3 converged on 6 specific v6 misalignments + 8 frontier additions. **6 fixes**: (1) Anthropic Skills blog explicitly rejects per-domain agents → collapse 6 specialty → 4 specialty workers (distinct tool surfaces) + CodeWork Skill + 1 PrincipalAgent supervisor; (2) GEPA as standing agent has no production precedent (Decagon ships offline only) → demote GepaOptimizer to offline batch tool; (3) "Sentinel-trip → replan" not in production → implement sentinels via Anthropic PostToolUse hooks contract; (4) 3-tier memory hierarchy is research, not convergent → switch to 4-scope hybrid (user/agent/session/org) via Mem0 or Letta; (5) Standing co-resident CapabilityProbe poisons trace store → move to CI/CD eval lane via Inspect AI snapshots; (6) "Earned-trust capability expansion" is custom semantics over RFC 8693 → ship standard delegation (table stakes per MCP 2026-03-15 spec, 86% enterprise adoption), drop escalation framing. **8 additions**: LangGraph durable substrate (Uber/JP Morgan/BlackRock production winner), Magentic-One Task Ledger + Progress Ledger pattern (2-iteration stall detection), 5th sentinel type JudgeHackingCheck (Gaia2 finding: agents make verifier-pleasing artifacts without solving task), cross-family MultiJudge (3× Sonnet correlates errors; add 1× non-Anthropic), CodeWork as Skill not agent (commodity tools), RFC 8707 Resource Indicators day-one (MCP mandate), reward-hack rate as Pareto axis in S6, CUDA/cuDNN/driver versions in reproducibility envelope. | v6 was ~60% frontier-aligned per audit. Cosmos pitch credibility requires ≥90% frontier alignment — reviewer will check architecture against Anthropic engineering blog + LangGraph docs + Microsoft Agent Framework + Inspect AI patterns. Better to pivot 14th time than commit 17 weeks of work to known frontier-misalignment. v7 IS final — process has converged via independent audit triangulation. Future findings = v1.1 work. | Header v6→v7 (frontier-aligned production system); §0.5 row 14 NEW (this row); §0.6 reframed (5 production agents + Skills + offline + frontier patterns); §0.65 reframed (production fleet + Skills + offline tools framing); §0.9 reframed (LangGraph + Magentic-One + Skills + Anthropic hooks); §1 phase table ~19w → ~21w (LangGraph integration + PrincipalAgent + 5th sentinel + Magentic-One ledger); §3.1 sentinel taxonomy 4→5 types; §3.2 PrincipalAgent architecture (LangGraph supervisor + Magentic-One ledger pattern). All shipped code (P0, P0.5 D1/D2/D3/D4) preserved — they are the substrate. |
 
 **Net pitch (v3.2)**: cosmos-lab is a `pip install`-able Python library (`pip install cosmos-lab[nat]`) that adds governance — sentinel-gated judging, MCP-OAuth identity with RFC 8693 sub-agent scope-down, GEPA promotion contracts, quality-budget invariants — to NeMo Agent Toolkit (primary) or ml-intern (compat). It emits OTel GenAI traces into Phoenix/Weave/Langfuse, evaluates on Inspect AI with anti-reward-hacking sentinels, executes on a 2-tier sandbox, post-trains via NeMo-RL, curates data via cosmos-curate stages. **Cosmos team will recognize every interface boundary AND the architectural maturity of library-vs-fork separation.**
 
@@ -332,97 +342,118 @@ A 2026 SOTA verification pass produced eight load-bearing changes (rows 1-8 belo
 
 ---
 
-## 0.6 What only cosmos-lab does — 9 Cosmos-specialized agents + production governance (v6)
+## 0.6 What only cosmos-lab does — frontier-aligned production system (v7)
 
-A Cosmos reviewer will reasonably ask: *"What does cosmos-lab build that I can't get by combining ml-intern + Devin + Inspect AI + DSPy?"* The answer is sharp: **9 NEW agents specialized for Cosmos team's actual ML lifecycle work** + ~16 production governance infrastructure components. ml-intern's tool primitives are leveraged as substrate; the agents themselves are what's NEW and specialized.
+A Cosmos reviewer in 2026 will reasonably ask: *"What does cosmos-lab build that I can't get by combining LangGraph + Inspect AI + DSPy + Anthropic Skills + Mem0?"* The answer is sharp: **a production agentic system that synthesizes 2026 frontier patterns specifically for Cosmos team's ML lifecycle work**, with the integrations + governance + Cosmos vertical specialization that no single OSS project ships end-to-end.
 
-### Layer 1 — 6 Cosmos-specialized ML lifecycle agents (the "agents doing real work" the JD asks for)
+### Production fleet — 5 agents (v7 — frontier-aligned)
 
-| # | Agent | What it does | Cosmos-specific specialization |
+Per Anthropic Skills convergence + Magentic-One Task/Progress Ledger pattern + LangGraph supervisor pattern (all 2026 frontier-validated).
+
+| # | Agent | Role | Distinct tool surface (passes "specialty boundary" test) | Frontier pattern |
+|---|---|---|---|---|
+| 1 | **PrincipalAgent** (P3) | Supervisor orchestrator | LangGraph supervisor + Magentic-One Task Ledger (facts+plan) + Progress Ledger (step tracking with 2-iteration stall detection) + Skills loader | Hierarchical orchestrator-worker (Anthropic Multi-Agent Research, Magentic-One, LangGraph supervisor — all 2026 production) |
+| 2 | **DataAgent** (P4a) | Worker | cosmos-curate Ray pipeline + NeMo Curator stages + Cosmos Predict for synthetic data gen — distinct enough from other workers | Magentic-One worker pattern (FileSurfer/WebSurfer/Coder analog) |
+| 3 | **EvalAgent** (P5) | Worker | Inspect AI Tasks + 5-type sentinel suite + cross-family MultiJudge — distinct eval surface | Inspect AI standard substrate |
+| 4 | **TrainOrchestrator** (P5) | Worker | NeMo-RL + SkyPilot/HF Jobs + ComputeBackend Protocol — distinct training surface | nat plugin pattern + production training orchestration |
+| 5 | **OptimizeAgent** (P6) | Worker | profiler + kernel selector + torch.compile + sandbox 2-tier — distinct optimization surface | Production optimization pattern |
+
+### Skills (loaded by PrincipalAgent — Anthropic Skills pattern, NOT separate agents)
+
+| Skill | Loaded when | Tools |
+|---|---|---|
+| **CodeWork** (P7) | Bug fixes, code generation tasks | read_file, write_file, run_tests, git_diff in E2B sandbox (commodity tools — Skill is correct shape per Anthropic 2026 blog) |
+| (others added as identified during P3-P10) | | |
+
+### Offline tools — NOT in production fleet (frontier-validated)
+
+These run as scheduled batch jobs or CI/CD eval lane, **not as standing agents**, per audit findings (no production team ships them as standing agents):
+
+| Tool | Cadence | What it does | Why offline (frontier evidence) |
 |---|---|---|---|
-| 1 | **DataAgent** (P3) | Curates real video data through cosmos-curate Ray pipelines + NeMo Curator stages; LLM-in-the-loop persona-rewriter; emits dataset card with W&B Artifacts lineage | cosmos-curate stages + NeMo Curator + Cosmos Predict for synthetic data gen |
-| 2 | **EvalAgent** (P4a) | Multi-judge eval with bootstrap CIs + reward-hack sentinels; PR-gating regression block; physics-consistency scorers for multimodal | Inspect AI tasks for Cosmos workloads; physics-consistency + temporal-coherence scorers |
-| 3 | **TrainOrchestrator** (P5) | Centaur HPO (LLM proposes, CMA-ES refines); ComputeBackend over SkyPilot/NeMo-Run/HF Jobs; NeMo-RL post-training | NeMo-RL native; SkyPilot Job Groups for multi-cloud; real GPU sweeps per Invariant 9 |
-| 4 | **OptimizeAgent** (P6) | Profiles workload, applies optimization (kernel fusion, torch.compile, layer pruning), measures speedup, validates quality | NIM serving optimization; Cosmos Reason 2 / Predict 2.5 inference paths |
-| 5 | **MultimodalPipelineAgent** (P9) | End-to-end Cosmos pipeline: data → train → eval → optimize on Cosmos Predict 2.5 + π₀.₅; real Cosmos NIM endpoint | Cosmos vertical end-to-end; AV scenario gen, robot manipulation, sim-to-real workflows |
-| 6 | **CodeAgent** (P9) | Capability-scoped to {read_file, write_file, run_tests, git_diff}; iterates on real OSS bug fixtures with E2B sandbox | Real GitHub OSS issues, not closed fixture; targets nvidia-nat or Inspect AI repos for upstream PR contribution |
+| **GepaOptimizer** | Monthly cron | Mine failure clusters → DSPy GEPA reflective text evolution → A/B test → signed promotion | Decagon ships GEPA offline only; no production deployment as standing agent (audit finding) |
+| **CapabilityProbe** | CI/CD on capability expansion events | 50+ adversarial probe tasks via Inspect AI snapshots of orchestrator | METR pattern — runs against snapshots, not co-resident; co-resident would poison trace store |
+| **CrossAgentEvaluator** | Quarterly | Spawn cosmos-lab vs Devin vs Claude Code vs human on identical task → Pareto frontier with reward-hack rate axis | Inspect AI cross-agent comparison pattern (HAL/HOLISTIC AGENT/SWE-Compass) |
 
-### Layer 2 — 3 governance agents (the "self-improving loops" the JD asks for)
+### Production governance infrastructure — ~16 components (built on frontier substrates)
 
-| # | Agent | What it does | Why an agent (not just a function) |
-|---|---|---|---|
-| 7 | **GepaOptimizer** (P8) | Weekly: mine failure clusters from trajectory store → propose prompt/tool-description revisions via dspy.GEPA → A/B test on golden suite → ratchet on lower-CI improvement → signed promotion record | Multi-step decision loop: failure mining → hypothesis generation → A/B design → promotion judgment |
-| 8 | **CapabilityProbe** (P7) | Adversarial: tries to escape capability scope before each capability expansion event; 50-task probe suite; reports findings to add new sentinels | Adversarial reasoning loop: pick attack → try → adapt → report; can't be a stateless function |
-| 9 | **CrossAgentEvaluator** (P10) | Quarterly: spawn ml-intern+cosmos-lab vs Devin vs Claude Code vs human researcher on identical Cosmos task; collect results; compute Pareto frontier; generate report | Multi-agent coordination + cross-system result merging; orchestration loop |
+| Category | Components | Frontier substrate / pattern |
+|---|---|---|
+| **Identity** | `AgentIdentity`, `CapabilityScopedRouter`, `AuditLog` (P0 shipped); MCP OAuth 2.1 + RFC 8707 + RFC 8693 token exchange + hash-chained Ed25519 signed log + KMS (P4b) | MCP 2026-03-15 spec mandates; 86% enterprise adoption (Clutch Security data); Signet/OrgKernel/Wirken OSS implementations 2026 |
+| **Sentinels** | **5 types** (Deterministic, OutputFormat, SideEffect, NoOp, **JudgeHacking** NEW per Gaia2 finding); cross-family `MultiJudge` (3× Sonnet + 1× non-Anthropic for variance reduction) | Implemented via Anthropic PostToolUse hooks contract (Claude Agent SDK pattern, not novel mechanism) |
+| **Trajectory + Memory** | `TrajectorySink` Protocol, `OTelGenAIEmitter` (gen_ai.* semconv) → Phoenix backend, **4-scope hybrid memory** (user/agent/session/org) via Mem0 or Letta | Mem0/Atlan/supermemory.ai 2026 convergent pattern (NOT 3-tier hierarchy) |
+| **Eval** | Inspect AI bridge, MultiJudge with bootstrap CIs, AGENTIC_EVAL_SPEC discipline (3-tier base + long-horizon + shadow extensions per honest framing, 6 surfaces S1-S6, 10+ commitments E1-E14) | UK AISI standard; METR/Apollo/CAISI use it; +5th sentinel per Gaia2; reward-hack rate as Pareto axis |
+| **Substrate** | **LangGraph durable supervisor** + **Magentic-One Task/Progress Ledger** | Production winners 2026 (Uber/JP Morgan/BlackRock/Cisco LangGraph; Microsoft Agent Framework absorbed Magentic-One) |
+| **Compute + Sandbox** | `ComputeBackend` Protocol (HF Jobs / SkyPilot / NeMo-Run / Modal), `SandboxRunner` (E2B for CPU + Daytona/OpenShell for GPU) | NVIDIA NemoClaw pattern for GPU sandbox |
+| **Reproducibility envelope** | seeds, deps hashes, model versions, tool registry hash, CUDA/cuDNN/driver versions, GPU SKU, OTel trace ID | Vertex AI manifest pattern |
+| **Deployment** | `cosmos_lab.harness.ml_intern.install_into_session` (D2 shipped — runs in worker nodes), `cosmos_lab.harness.nat.register_as_nat_tool` (D3 shipped), `nat run cosmos-lab.yaml` reference workflow | nat plugin pattern (NVIDIA NeMo Agent Toolkit 1.6) |
 
-### Layer 3 — ~16 production governance infrastructure components
+### ml-intern primitives (LEVERAGED inside LangGraph nodes, NOT reimplemented)
 
-| Category | Components |
-|---|---|
-| **Identity** | `AgentIdentity`, `CapabilityScopedRouter`, `AuditLog` (P0 — shipped); MCP OAuth client + RFC 8707 + RFC 8693 token exchange + hash-chained signed log (P4b) |
-| **Sentinels** | 4 types (`DeterministicStateCheck`, `OutputFormatCheck`, `SideEffectCheck`, `NoOpCheck`) + `MultiJudge` + paired evaluator + adversarial probe suite |
-| **Trajectory + Memory** | `TrajectorySink` Protocol, `OTelGenAIEmitter` (gen_ai.* semconv) → Phoenix backend, 3-tier memory (working/episodic/semantic) |
-| **Eval** | Inspect AI bridge, MultiJudge with bootstrap CIs, AGENTIC_EVAL_SPEC (T0-T4 + S1-S6 + E1-E10) |
-| **Compute + Sandbox** | `ComputeBackend` Protocol (HF Jobs / SkyPilot / NeMo-Run / Modal), `SandboxRunner` (E2B + Daytona) |
-| **Deployment** | `cosmos_lab.harness.ml_intern.install_into_session` (D2 — shipped), `cosmos_lab.harness.nat.register_as_nat_tool` (D3 — shipped), `nat run cosmos-lab.yaml` reference workflow |
-
-### Layer 4 — ml-intern primitives (LEVERAGED as substrate, NOT reimplemented)
-
-ml-intern provides building blocks our specialty agents USE:
-- `agent_loop.submission_loop` — async ReAct loop (each specialty agent invokes a fresh ml-intern session for execution)
-- 16 generic tools (file ops, web, github, hf_repo, plan, sandbox, etc.) — specialty agents use these + add Cosmos-specific tools on top
+ml-intern provides building blocks our specialty workers USE:
+- `agent_loop.submission_loop` — invoked inside LangGraph worker nodes for actual ReAct execution
+- 16 generic tools (file ops, web, github, hf_repo, plan, sandbox, etc.)
 - MCP integration (hf-mcp-server)
-- `doom_loop.py`, `cost_estimation.py`, `approval_policy.py`, `telemetry.py` — runtime primitives
+- `doom_loop.py`, `cost_estimation.py`, `approval_policy.py`, `telemetry.py`
 
-### The differentiator vs assembled OSS
+### Differentiator vs assembled OSS (v7)
 
-| What you get | ml-intern alone | + Inspect AI | + DSPy GEPA | + nat | **+ cosmos-lab (v6)** |
-|---|---|---|---|---|---|
-| Autonomous ML execution | ✅ | — | — | — | ✅ leveraged |
-| Eval framework | ❌ | ✅ generic | — | — | ✅ specialized for Cosmos |
-| Self-improvement | ❌ | ❌ | ✅ generic | — | ✅ governed (signed promotions) |
-| Workflow runtime | ❌ | ❌ | ❌ | ✅ generic | ✅ Cosmos workflow YAML |
-| **6 Cosmos-specialty agents** | ❌ | ❌ | ❌ | ❌ | ✅ **NEW (cosmos-lab P3-P9)** |
-| **3 governance agents** | ❌ | ❌ | ❌ | ❌ | ✅ **NEW (cosmos-lab P7-P10)** |
-| **Sentinel taxonomy + paired eval** | ❌ | ❌ | ❌ | ❌ | ✅ **NEW (cosmos-lab P1)** |
-| **RFC 8693 capability expansion** | ❌ | ❌ | ❌ | ❌ | ✅ **NEW (cosmos-lab P4b)** |
-| **Signed audit (EU AI Act Art. 12)** | ❌ | ❌ | ❌ | ❌ | ✅ **NEW (cosmos-lab P4b)** |
-| **AGENTIC_EVAL_SPEC discipline** | ❌ | ❌ | ❌ | ❌ | ✅ **NEW (E1-E10)** |
+| Capability | LangGraph alone | + Inspect AI | + Anthropic Skills | + DSPy GEPA | + nat | **+ cosmos-lab v7** |
+|---|---|---|---|---|---|---|
+| Durable supervisor | ✅ | — | — | — | — | ✅ leveraged |
+| Frontier eval framework | — | ✅ generic | — | — | — | ✅ extended (5 sentinels + Pareto axis) |
+| Skills pattern | — | — | ✅ generic | — | — | ✅ adopted (CodeWork) |
+| Self-improvement | — | — | — | ✅ offline | — | ✅ governed (signed promotions) |
+| NVIDIA stack deployment | — | — | — | — | ✅ generic | ✅ Cosmos workflow YAML |
+| **5 Cosmos-aligned agents** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ **NEW** |
+| **CodeWork as Skill** | ❌ | ❌ | ❌ (no Cosmos integration) | ❌ | ❌ | ✅ **NEW** |
+| **5-type sentinel taxonomy** (incl judge-hacking) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ **NEW** |
+| **Cross-family MultiJudge** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ **NEW** |
+| **Magentic-One ledger pattern in LangGraph supervisor** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ **NEW synthesis** |
+| **MCP OAuth + RFC 8693 + signed audit (EU AI Act)** | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ **NEW** |
+| **GepaOptimizer governance contract (signed promotions)** | ❌ | ❌ | ❌ | ⚠️ optimizer only | ❌ | ✅ **NEW** |
+| **CapabilityProbe in CI/CD lane** | ❌ | ⚠️ via Inspect | ❌ | ❌ | ❌ | ✅ **NEW orchestration** |
+| **CrossAgentEvaluator quarterly Pareto** | ❌ | ⚠️ via Inspect | ❌ | ❌ | ❌ | ✅ **NEW** |
 
-**One-line pitch (v6)**: cosmos-lab ships **6 Cosmos-specialized ML lifecycle agents** (Data, Eval, Train, Optimize, MultimodalPipeline, Code) + **3 governance agents** (GEPA, Probe, CrossAgent) + production governance infrastructure (sentinels, identity, audit, OTel, memory tiers), built on ml-intern's tool primitives leveraged AS-IS. Demonstrated on Cosmos Reason 2 / Predict 2.5 workflows with measured numbers + signed audit + sentinel agreement. Deployed via `nat run cosmos-lab.yaml` into Cosmos team's stack.
+**One-line pitch (v7)**: cosmos-lab synthesizes 2026 frontier patterns (Anthropic Skills + Magentic-One ledgers + LangGraph durable supervisor + Inspect AI + Mem0 4-scope memory + MCP OAuth + DSPy GEPA offline) into a **production agentic system specifically for NVIDIA Cosmos team's ML lifecycle work** — 5 agents (PrincipalAgent + 4 specialty workers) + CodeWork Skill + 3 offline governance tools + ~16 infrastructure components, on ml-intern's tool primitives leveraged inside LangGraph worker nodes. Deployed via `nat run cosmos-lab.yaml` into Cosmos team's stack. **What no single OSS project ships end-to-end: Cosmos vertical specialization + 5-sentinel governance + signed audit (EU AI Act compliant) + Magentic-One ledger orchestration + cross-agent Pareto comparison.**
 
 ---
 
-## 0.65 Nine agents shipped + ~16 governance components (v6 — honest agent count)
+## 0.65 Production fleet + Skills + offline tools (v7 — frontier-aligned shape)
 
-The product is **9 NEW agents** (6 Cosmos-specialty + 3 governance) **+ ~16 production governance infrastructure components** + **leverage of ml-intern's tool primitives as substrate**. This is the honest count — not "0 new agents" (v5.2 over-correction) and not "1 PrincipalAgent" (v5/v5.1 over-correction).
+The product is **5 production agents** (1 PrincipalAgent supervisor + 4 specialty workers with distinct tool surfaces) + **1+ Skills** (CodeWork as Anthropic-style Skill) + **3 offline governance tools** (NOT standing agents — frontier convergence rejected this) + **~16 infrastructure components** + **leverage of ml-intern's tool primitives as substrate inside LangGraph worker nodes**.
 
-### Layer 1 — 6 Cosmos-specialty ML lifecycle agents
+### Layer 1 — 5 production agents (PrincipalAgent supervisor + 4 specialty workers, v7)
 
-| # | Agent | Phase(s) | Real ML work it does | Real GPU? |
+| # | Agent | Phase(s) | Role + distinct tool surface | Real GPU? |
 |---|---|---|---|---|
-| 1 | **DataAgent** | P3 (W6-7) | Curates 10-100 hours real video through cosmos-curate; LLM-in-the-loop persona-rewriter; ships dataset card with W&B Artifacts lineage | ✅ (cosmos-curate Ray cluster) |
-| 2 | **EvalAgent** | P4a (W10) | Multi-judge with bootstrap CIs + reward-hack sentinels; PR-gating regression block; physics-consistency scorers for multimodal | no |
-| 3 | **TrainOrchestrator** | P5 (W11-12.5) | Centaur HPO; ComputeBackend; NeMo-RL post-training on real GPU sweep | ✅ (Inv 9) |
-| 4 | **OptimizeAgent** | P6 (W14-15.5) | Profiles workload + applies optimization; ≥1.5× speedup on 4 real workloads, ≤2% regression | ✅ (Inv 9) |
-| 5 | **MultimodalPipelineAgent** | P9a (W17-18) | E2E: cosmos-curate → NeMo-RL → Inspect AI eval → Centaur opt on Cosmos Predict 2.5 + π₀.₅; real Cosmos NIM endpoint | ✅ (Inv 9: real Cosmos NIM ≥1×) |
-| 6 | **CodeAgent** | P9b (W18-19) | Capability-scoped {read_file, write_file, run_tests, git_diff}; ≥60% on 10-bug fixture; stretch: real OSS PR with reviewer engagement | no (E2B sandbox) |
+| 1 | **PrincipalAgent** | P3 (W6-7) | Supervisor: LangGraph supervisor pattern + Magentic-One Task/Progress Ledger (2-iteration stall detection) + Skills loader + sub-agent spawn coordinator | no |
+| 2 | **DataAgent** | P4a (W8.5) | Worker — distinct cosmos-curate/NeMo Curator surface; processes 10-100 hours real video; dataset card with W&B Artifacts lineage | ✅ (cosmos-curate Ray cluster) |
+| 3 | **EvalAgent** | P5 (W11) | Worker — distinct Inspect AI/MultiJudge surface; cross-family judges (3× Sonnet + 1× non-Anthropic); 5-type sentinel suite incl. judge-hacking | no |
+| 4 | **TrainOrchestrator** | P5 (W11.5-12) | Worker — distinct NeMo-RL/SkyPilot surface; Centaur HPO; first real GPU sweep | ✅ (Inv 9) |
+| 5 | **OptimizeAgent** | P6 (W13.5-15) | Worker — distinct profiler/kernel/sandbox surface; ≥1.5× speedup on 4 real workloads, ≤2% regression | ✅ (Inv 9) |
 
-### Layer 2 — 3 governance agents (the meta layer)
+### Layer 2 — Skills (loaded by PrincipalAgent — Anthropic Skills pattern)
 
-| # | Agent | Phase | What it does | Why an agent (not a function) |
+| Skill | Phase | Tools | Why a Skill not an Agent |
+|---|---|---|---|
+| **CodeWork** | P7 (W15.5-16) | read_file, write_file, run_tests, git_diff in E2B sandbox | Commodity tools (every framework has them); per Anthropic 2026 Skills blog, commodity capabilities should be Skills loaded by general agent, not separate processes |
+
+### Layer 3 — 3 OFFLINE governance tools (NOT standing agents — frontier convergence)
+
+| # | Tool | Cadence | What it does | Why offline (frontier evidence) |
 |---|---|---|---|---|
-| 7 | **GepaOptimizer** | P8 (W16-17) | Weekly: mine failure clusters → propose prompt/tool revisions via dspy.GEPA → A/B test → ratchet on lower-CI improvement → signed promotion record | Multi-step decision loop: failure mining + hypothesis generation + A/B design + promotion judgment |
-| 8 | **CapabilityProbe** | P7 (W15-16) | Adversarial: tries to escape capability scope before each expansion event; 50-task probe suite; reports findings to add new sentinels | Adversarial reasoning loop: pick attack → try → adapt → report |
-| 9 | **CrossAgentEvaluator** | P10 (W19-20) | Quarterly: spawn ml-intern+cosmos-lab vs Devin vs Claude Code vs human on identical Cosmos task; collect results; compute Pareto frontier | Multi-agent coordination + cross-system result merging |
+| 1 | **GepaOptimizer** | Monthly cron | Mine failure clusters → DSPy GEPA reflective evolution → A/B test → ratchet on lower-CI → signed promotion | Decagon ships GEPA offline only; NO public production deployment as standing agent (audit) |
+| 2 | **CapabilityProbe** | CI/CD on capability expansion events | 50+ adversarial probes via Inspect AI snapshots of orchestrator | METR pattern; co-resident standing would poison trace store (audit) |
+| 3 | **CrossAgentEvaluator** | Quarterly | Spawn cosmos-lab vs Devin vs Claude Code vs human → Pareto frontier with reward-hack rate axis | Inspect AI cross-agent comparison standard (HAL/HOLISTIC AGENT/SWE-Compass) |
 
-### Layer 3 — ~16 governance infrastructure components
+### Layer 4 — ~16 infrastructure components
 
-Already enumerated in §0.6 above. Categories: identity, sentinels, trajectory+memory, eval, compute+sandbox, deployment.
+Already enumerated in §0.6 above. Categories: identity (P0 + RFC 8693), 5-type sentinels (incl. judge-hacking) via Anthropic PostToolUse hook contract, OTel + 4-scope hybrid memory (Mem0/Letta), Inspect AI + cross-family MultiJudge, **LangGraph durable supervisor + Magentic-One ledger pattern**, ComputeBackend + sandbox 2-tier, reproducibility envelope (incl. CUDA versions), deployment via nat wrapper.
 
-### Layer 4 — ml-intern primitives (LEVERAGED, not built)
+### Layer 5 — ml-intern primitives (LEVERAGED inside LangGraph worker nodes)
 
-Each specialty agent uses ml-intern's `agent_loop` + 16 generic tools + sandbox + MCP as substrate. Specialty agents add Cosmos-specific tools (NIMProvider, cosmos_reason, cosmos_predict, cosmos_transfer) and Cosmos-aligned system prompts on top.
+Each LangGraph worker node uses ml-intern primitives (agent_loop, 16 generic tools, sandbox, MCP, cost estimation, doom-loop detection) for actual ReAct execution within its specialty.
 
 ### The demonstration (v6 — specialty agents in action)
 
@@ -627,9 +658,9 @@ v5.2 ships the production governance layer that turns autonomous agents from res
 
 ---
 
-## 1. Phase table (~19 weeks — v6: 6 specialty agents + 3 governance agents + infrastructure)
+## 1. Phase table (~21 weeks — v7: 5 production agents + Skills + 3 offline tools + frontier substrate)
 
-> **v6 framing**: cosmos-lab ships 9 NEW agents (6 specialty + 3 governance) + ~16 infrastructure components, on ml-intern's tool primitives leveraged AS-IS. Phases are **agent shipments + supporting infrastructure**. Schedule between v5.2's 13w (too aggressive — removed agents JD asks for) and v5/v5.1's 22.5w (too long — included reimplementation). v6 is honest: ~19w because we ship real specialty agents but use ml-intern primitives instead of rebuilding them.
+> **v7 framing**: cosmos-lab ships 5 production agents (1 PrincipalAgent supervisor + 4 specialty workers with distinct tool surfaces) + 1+ Skills + 3 offline governance tools + ~16 infrastructure components on **LangGraph durable supervisor + Magentic-One ledger pattern** + ml-intern's tool primitives leveraged inside worker nodes. Schedule ~21w (slightly more than v6's 19w because we add LangGraph integration + PrincipalAgent foundation + Magentic-One ledger pattern + 5th sentinel type — all frontier-required additions per 3-audit verification). Frontier-aligned, not optimistic.
 
 > **v4 schedule rationale**: v3.2 trimmed to 20 weeks by inheriting nat plumbing. v4 adds **P5.5 PyTorch Depth (1w)** + **P10 expansion (1w)** to close production-grade gaps (§0.8). Net: 20 → ~22.5 weeks; still inside original 24-week budget. Banked ~1.5 weeks remain as risk buffer.
 >
@@ -637,21 +668,21 @@ v5.2 ships the production governance layer that turns autonomous agents from res
 
 | New | Wks | Phase | What ships | Real GPU? |
 |---|---|---|---|---|
-| P0 | 1 | Foundation + identity (AuthZ MVP) *(shipped)* | `AgentIdentity`, `AuditLog`, `CapabilityScopedRouter`, `OptimizationConfig` — substrate for all 9 agents | no |
-| **P0.5** | **0.6** | **Library restructure + harness adapters** *(shipped)* | `cosmos_lab/` package + `install_into_session()` (D2 — used by all specialty agents to wrap ml-intern sessions) + `register_as_nat_tool()` (D3 — deployment surface) | no |
-| **P1** | **2** | **Eval infrastructure** (foundation for EvalAgent, used by all agents) | `TrajectorySink` Protocol, `OTelGenAIEmitter` → Phoenix, 4 sentinel types (§3.1), `MultiJudge` with bootstrap CIs, Inspect AI bridge, 5 seed Inspect tasks, `evaluate` CLI | no |
-| **P2** | **1** | **Cosmos toolset** (Cosmos-specific tools all specialty agents use) | `NIMProvider` (litellm custom), `cosmos_reason`/`predict`/`transfer` tool wrappers, 5 cosmos Inspect tasks | no (mocked NIM) |
-| **P3** | **1.5** | **🤖 AGENT 1 — DataAgent** | Cosmos-specialty: composes cosmos-curate + NeMo Curator stages + LLM-in-the-loop persona-rewriter; ships dataset card with W&B Artifacts lineage; **processes 10-100 hours real video** (Invariant 9) | ✅ (cosmos-curate Ray cluster) |
-| **P4a** | **1** | **🤖 AGENT 2 — EvalAgent** | Cosmos-specialty: multi-judge with bootstrap CIs + reward-hack sentinels; PR-gating regression block; physics-consistency scorers; Inspect View embed | no |
-| **P4b** | **2** | **Identity v2 + capability expansion mechanism** | MCP OAuth 2.1 + RFC 8707 + RFC 8693 token exchange + hash-chained signed log (Ed25519 v1, KMS in P10) — used by all 9 agents for capability scope + audit | no |
-| **P5** | **1.5** | **🤖 AGENT 3 — TrainOrchestrator** | Cosmos-specialty: Centaur HPO (LLM proposes, CMA-ES refines); ComputeBackend over SkyPilot/NeMo-Run/HF Jobs; NeMo-RL post-training; **first real GPU sweep** (Invariant 9) | ✅ (Inv 9) |
+| P0 | 1 | Foundation + identity (AuthZ MVP) *(✅ shipped)* | `AgentIdentity`, `AuditLog`, `CapabilityScopedRouter`, `OptimizationConfig` — substrate for all 5 agents | no |
+| **P0.5** | **0.6** | **Library restructure + harness adapters** *(✅ shipped)* | `cosmos_lab/` package + `install_into_session()` (D2) + `register_as_nat_tool()` (D3) + adapter contract (D4) | no |
+| **P1** | **2** | **Eval infrastructure** (foundation for EvalAgent + used by all workers) | `TrajectorySink` Protocol, `OTelGenAIEmitter` → Phoenix, **5 sentinel types** (incl. **JudgeHackingCheck** per Gaia2), **cross-family `MultiJudge`** (3× Sonnet + 1× non-Anthropic), Inspect AI bridge via Anthropic PostToolUse hooks contract, 5 seed Inspect tasks, `evaluate` CLI | no |
+| **P2** | **1** | **Cosmos toolset** (Cosmos-specific tools all workers use) | `NIMProvider` (litellm custom), `cosmos_reason`/`predict`/`transfer` tool wrappers, 5 cosmos Inspect tasks | no (mocked NIM) |
+| **P3** | **2** | **🤖 PrincipalAgent foundation (NEW supervisor agent)** | **LangGraph durable supervisor** + **Magentic-One Task Ledger (facts+plan) + Progress Ledger (step-tracking with 2-iteration stall detection)** + **4-scope hybrid memory** (user/agent/session/org) via Mem0 or Letta + Skills loader + sub-agent spawn coordinator. Foundation for ALL 4 workers. | no |
+| **P4a** | **1.5** | **🤖 DataAgent (worker #1)** | Distinct cosmos-curate/NeMo Curator surface: composes Ray pipeline + LLM-in-the-loop persona-rewriter; **processes 10-100 hours real video** (Invariant 9); dataset card with W&B Artifacts lineage | ✅ (cosmos-curate Ray cluster) |
+| **P4b** | **2** | **Identity v2 — MCP OAuth + RFC 8707 + RFC 8693 + signed audit** | Per MCP 2026-03-15 spec (86% enterprise adoption); table stakes delegation + signed audit (Ed25519 v1, KMS in P10) — drop "earned trust escalation" framing per audit | no |
+| **P5** | **2** | **🤖 EvalAgent + 🤖 TrainOrchestrator (workers #2 + #3)** | EvalAgent (1w): leverages P1 eval infra; physics-consistency scorers; PR-gating; cross-family judges. TrainOrchestrator (1w): Centaur HPO; ComputeBackend; NeMo-RL; **first real GPU sweep** (Invariant 9) | ✅ (Inv 9) |
 | **P5.5** | **1** | **PyTorch depth artifact** (substrate + capability proof) | One PyTorch artifact (custom autograd op OR torch.compile pattern with profiler-driven kernel selection); ≥10% wall-clock improvement; demonstrates "deep PyTorch familiarity" JD bullet | ✅ (Inv 9) |
-| **P6** | **1.5** | **🤖 AGENT 4 — OptimizeAgent** | Cosmos-specialty: profiles workload, applies optimization (kernel fusion, torch.compile, layer pruning); **≥1.5× speedup on 4 real workloads, ≤2% regression** | ✅ (Inv 9) |
-| **P7** | **1** | **🤖 AGENT 5 — CapabilityProbe (governance) + 3-tier memory** | Governance agent #1: 50-task denied-tool probe suite (S4 from AGENTIC_EVAL_SPEC); pre-expansion adversarial validation. Plus 3-tier memory (working/episodic/semantic) used by all specialty agents | no |
-| **P8** | **2** | **🤖 AGENT 6 — GepaOptimizer (governance)** | Governance agent #2: weekly DSPy 3.x `dspy.GEPA` over trajectory store; failure mining → prompt revisions → A/B test → ratchet on lower-CI improvement → signed promotion. Improves all 6 specialty agents over time | no |
-| **P9** | **2** | **🤖 AGENT 7+8 — MultimodalPipelineAgent + CodeAgent** | MultimodalPipelineAgent: e2e Cosmos workflow (Data → Train → Eval → Optimize) on Cosmos Predict 2.5 + π₀.₅; **real Cosmos NIM endpoint** (Invariant 9). CodeAgent: ≥60% on 10-bug fixture; stretch real OSS PR | ✅ (Inv 9: real Cosmos NIM ≥1×) |
-| **P10** | **2** | **🤖 AGENT 9 — CrossAgentEvaluator (governance) + production deploy + nat YAML + OSS PR + demo** | Governance agent #3: quarterly S6 comparison (ml-intern+cosmos-lab vs Devin vs Claude Code vs human); Pareto chart. Plus: HF Spaces / Modal endpoint with ≥100 real user sessions; ≥1 upstream PR to nvidia-nat or Inspect AI; `pip install cosmos-lab[all]`; `nat run cosmos-lab.yaml` reference; KMS migration; 5-min demo video | yes (production) |
-| **Total** | **~19** | | **9 NEW agents (6 specialty + 3 governance) + ~16 infra components, on ml-intern primitives** | **5 phases real GPU** |
+| **P6** | **1.5** | **🤖 OptimizeAgent (worker #4)** | Distinct profiler/kernel/sandbox surface: applies optimization (kernel fusion, torch.compile, layer pruning); **≥1.5× speedup on 4 real workloads, ≤2% regression** | ✅ (Inv 9) |
+| **P7** | **1** | **CodeWork Skill + CapabilityProbe (CI/CD lane) + S5 red-team automation** | CodeWork Skill loaded by PrincipalAgent (commodity tools, NOT separate agent per Anthropic Skills); CapabilityProbe runs in CI/CD against Inspect AI snapshots (NOT standing co-resident); monthly red-team sprint automation | no (E2B sandbox for Skill) |
+| **P8** | **1.5** | **GepaOptimizer (offline batch tool, NOT standing agent)** | Monthly cron: DSPy `dspy.GEPA` reflective text evolution over trajectory store; A/B test on Inspect AI golden suite; lower-CI ratchet → signed promotion record. Frontier-validated as offline only (Decagon pattern). | no |
+| **P9** | **1.5** | **MultimodalPipeline DEMO (orchestrate existing agents)** | NOT a new agent: PrincipalAgent orchestrates DataAgent → TrainOrchestrator → EvalAgent → OptimizeAgent on Cosmos Predict 2.5 + π₀.₅; **real Cosmos NIM endpoint** (Invariant 9). Demo proves the existing 5 agents compose cohesively. | ✅ (Inv 9: real Cosmos NIM ≥1×) |
+| **P10** | **2** | **CrossAgentEvaluator (offline) + production deploy + nat YAML + OSS PR + demo** | CrossAgentEvaluator quarterly batch: cosmos-lab vs Devin vs Claude Code vs human → Pareto frontier with **reward-hack rate axis** (per audit). Plus: HF Spaces / Modal endpoint ≥100 real user sessions; ≥1 upstream PR (nvidia-nat or Inspect AI); `pip install cosmos-lab[all]`; `nat run cosmos-lab.yaml` reference; KMS migration; 5-min demo video | yes (production) |
+| **Total** | **~21** | | **5 production agents + 1+ Skills + 3 offline tools + ~16 infra on LangGraph + Magentic-One + ml-intern primitives** | **5 phases real GPU** |
 
 ---
 
@@ -848,30 +879,51 @@ DuckDB stays — but as a *query/analytics layer over OTel spans*, not as the sc
 
 ---
 
-## 3.1 Sentinel taxonomy (v3.1) — the platform's spine made concrete
+## 3.1 Sentinel taxonomy (v7 — 5 types, including judge-hacking detector per Gaia2)
 
 The single highest-leverage thing cosmos-lab does is **block judge-only metrics from reaching gates**. To enforce that across phases, we need a *taxonomy* of structural verifiers, not a vague "structural check." Every Inspect task contributes one judge `Scorer` and one sentinel from this taxonomy. Sentinel/judge disagreement → run flagged for review, never silently accepted.
+
+> **v7 update**: added 5th sentinel type **`JudgeHackingCheck`** per Gaia2 finding (Meta ARE, Oct 2025): agents make verifier-pleasing artifacts without solving task. Gaia2 specifically surfaces this as distinct failure class. Implementation contract: all 5 types ride on **Anthropic PostToolUse hook** primitive (Claude Agent SDK contract) — sentinels are NOT a novel cosmos-lab mechanism but a structured taxonomy over the convergent hooks pattern.
 
 | Sentinel type | What it checks | Failure mode it blocks | Example (P1 seed task) |
 |---|---|---|---|
 | **`DeterministicStateCheck`** | A boolean function on post-run filesystem / DB / object state | "Judge said it worked, but nothing actually changed" | *dataset-inspect task*: `assert (workdir / "schema.json").exists() and parse_json(...) has expected keys` |
 | **`OutputFormatCheck`** | Strict schema/regex/parse on the agent's final tool output | "Judge said the answer was good, but it's not parseable" | *paper-summary task*: response must be parseable JSON with `{title, key_findings: list[str], limitations: str}` |
 | **`SideEffectCheck`** | A boolean over emitted OTel spans (specific tool was called, in expected order, with expected args) | "Judge said the agent reasoned through it, but the agent never actually ran the profiler" | *profiling task*: assert one `gen_ai.tool.call` with `tool.name = "torch_profiler"` and non-empty result span |
-| **`NoOpCheck`** | The agent did *something* — at least N tool calls, modified at least one file, latency above lower bound | "Judge said pass on a no-op trajectory" — the canonical reward-hack pattern Berkeley audited | every task: assert `tool_call_count >= 1 AND wall_clock >= 100ms AND not all(span.result == "")` |
+| **`NoOpCheck`** | The agent did *something* — at least N tool calls, modified at least one file, latency above lower bound | "Judge said pass on a no-op trajectory" — the canonical reward-hack pattern Berkeley audited (100% exploit rate on SWE-bench Verified, Terminal-Bench, FieldWorkArena) | every task: assert `tool_call_count >= 1 AND wall_clock >= 100ms AND not all(span.result == "")` |
+| **`JudgeHackingCheck`** *(NEW v7)* | Detects pattern of verifier-pleasing artifacts: agent produced output that satisfies judge rubric but bypasses substantive task — e.g., wrote conftest.py to make tests pass without fixing bug, planted markers in output to signal completion to judge, output structure-matches but semantics diverge | "Agent gamed the judge with verifier-pleasing artifacts without solving task" — Gaia2 finding (Meta ARE Oct 2025); IQuest-Coder-V1 24.4% gain came from copying answers from git history | *bug-fix task*: assert NOT (`conftest.py` newly created OR `pytest.skip` markers added OR judge-output-keywords appear without test-passing-evidence) |
 
-**Composition rule**: a task's sentinel = `DeterministicStateCheck OR OutputFormatCheck OR SideEffectCheck`, **always AND-ed with `NoOpCheck`**. NoOpCheck is mandatory on every task — it catches the cheapest reward-hack class for free.
+**Composition rule (v7)**: a task's sentinel = `(DeterministicStateCheck OR OutputFormatCheck OR SideEffectCheck OR JudgeHackingCheck)`, **always AND-ed with `NoOpCheck`**. NoOpCheck is mandatory on every task — it catches the cheapest reward-hack class for free.
 
-**Why these four**: directly map to the failure modes UC Berkeley demonstrated (no work done, fake output, judge-prompt injection, monkey-patching the grader). Berkeley's "near-perfect scores with zero LLM calls" is *exactly* what `NoOpCheck` blocks.
+**Why these five**: directly map to failure modes documented in 2026 production audits:
+- **NoOp**: UC Berkeley "near-perfect scores with zero LLM calls" (2026)
+- **DeterministicState**: METR reward-hacking findings — claim-without-action pattern
+- **OutputFormat**: SWE-bench gaming via output structure-matching
+- **SideEffect**: Berkeley's "fake successful trajectory" pattern (tool listed but not invoked)
+- **JudgeHacking** *(NEW)*: Gaia2 (Meta ARE Oct 2025) — verifier-pleasing artifacts without task solution
 
-**Owned path**: `agent/optimization/eval/sentinels/{deterministic.py,output_format.py,side_effect.py,no_op.py}`. Each ships with ≥3 unit tests covering green path + intended failure detection + edge case (empty workdir, malformed JSON, missing span).
+**Implementation contract**: sentinels implemented as **Anthropic PostToolUse hooks** (Claude Agent SDK pattern) — NOT a novel cosmos-lab mechanism. Hook fires after each tool call, sentinel evaluates, structured signal returned. Composes with Anthropic's hook lifecycle natively.
+
+**Owned path**: `agent/optimization/eval/sentinels/{deterministic.py,output_format.py,side_effect.py,no_op.py,judge_hacking.py}`. Each ships with ≥3 unit tests covering green path + intended failure detection + edge case.
 
 **Task-author contract**: every Inspect `@task` we ship registers exactly one judge Scorer and exactly one composed sentinel via `@sentinel(...)`. Tasks without both fail CI before merge.
 
 ---
 
-## 3.2 PrincipalAgent architecture (v5 — the autonomous heart)
+## 3.2 PrincipalAgent architecture (v7 — LangGraph supervisor + Magentic-One ledgers)
 
-The architectural answer to §0.9's autonomous-principal-agent thesis. This is the technical specification for the agent itself — the loop, memory tiers, planning module, replanning logic, capability expansion mechanism.
+The architectural answer to §0.9's thesis. v7 specifies PrincipalAgent as **LangGraph durable supervisor** (production winner — Uber/JP Morgan/BlackRock/Cisco) + **Magentic-One Task/Progress Ledger pattern** (graduated into Microsoft Agent Framework). This is NOT a novel cosmos-lab orchestrator design — it's a synthesis of two 2026 production-validated patterns specialized for ML lifecycle work.
+
+### 3.2.0 Frontier substrate choices (v7 audit-driven)
+
+| Substrate | Choice | Frontier evidence |
+|---|---|---|
+| **Orchestration** | LangGraph supervisor pattern | Production winner 2026: Uber/JP Morgan/BlackRock/Cisco/LinkedIn/Klarna; durable execution + checkpoint-restore stable in v1.0 |
+| **Planning model** | Magentic-One Task Ledger (facts + plan) + Progress Ledger (step tracking with 2-iteration stall detection) | Microsoft Agent Framework absorbed Magentic-One as first-class workflow (April 2026); 2-iteration stall detection is what makes it production-robust |
+| **Memory model** | 4-scope hybrid (user/agent/session/org) via Mem0 or Letta | Mem0/Atlan/supermemory.ai 2026 convergent pattern; Anthropic memory tool = flat persistent file |
+| **Sentinel mechanism** | Anthropic PostToolUse hook contract | Claude Agent SDK pattern; deterministic + composable + frontier-aligned |
+| **Sub-agent spawning** | RFC 8693 token exchange (depth=1, bounded) | OpenAI Codex hardcodes max_depth=1 (convergent default after recursion incidents) |
+| **Skills loading** | Anthropic Skills pattern (markdown + scripts loaded by general agent) | Anthropic Skills blog 2026: explicit rejection of per-domain agents in favor of Skills |
 
 ### 3.2.1 Substrate choice — ml-intern's `agent_loop.py`, not from scratch
 
